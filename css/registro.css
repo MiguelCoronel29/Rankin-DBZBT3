@@ -1,0 +1,8 @@
+/* ============================================================
+   REGISTRO.CSS — Registration Page (inherits login.css base styles via HTML link)
+   ============================================================ */
+
+/* Any overrides specific to registration go here */
+.login-card {
+    max-width: 440px;
+}

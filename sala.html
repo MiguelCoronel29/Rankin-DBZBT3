@@ -1,310 +1,76 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
-    <title>Sala de Batalla Persistente - DBZ BT3</title>
+    <title>Sala de Batalla — DBZ BT3</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="css/sala.css">
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
-
-    <style>
-        /* ESTILOS VISUALES: Define colores, tamaños y animaciones de la interfaz */
-        body { font-family: 'Segoe UI', sans-serif; background: #0d0d0d; color: white; margin: 0; padding: 10px; text-align: center; }
-        .container { max-width: 500px; margin: auto; background: #1a1a1a; padding: 20px; border-radius: 15px; border: 1px solid #333; }
-        .player-card { flex: 1; padding: 15px; border-radius: 10px; background: #252525; margin: 5px; border: 2px solid #444; }
-        .score { font-size: 3.5rem; font-weight: bold; color: #FFD700; text-shadow: 0 0 10px rgba(255, 215, 0, 0.3); }
-        button { cursor: pointer; border: none; border-radius: 5px; font-weight: bold; padding: 12px; transition: 0.2s; }
-        input, select { padding: 12px; width: 85%; border-radius: 8px; margin-bottom: 10px; background: #000; color: #fff; border: 1px solid #333; text-align: center; }
-        .btn-entrar { background: #FFD700; color: #000; width: 85%; font-size: 1.1rem; }
-        .btn-puntos { width: 100%; font-size: 1.2rem; background: #333; color: white; margin-top: 10px; border: 1px solid #555; }
-        .btn-puntos:active { background: #FFD700; color: black; }
-        .btn-puntos:disabled { opacity: 0.2; }
-        
-        /* OVERLAY: Pantalla de carga/victoria que cubre todo al finalizar */
-        #winner-overlay {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.95); z-index: 1000; justify-content: center; align-items: center; flex-direction: column;
-        }
-        .winner-box { background: #222; padding: 30px; border-radius: 20px; border: 2px solid #FFD700; }
-    </style>
+    <script src="utils/firebase-config.js"></script>
 </head>
+
 <body>
 
+    <!-- Winner Overlay -->
     <div id="winner-overlay">
         <div class="winner-box">
-            <h2 id="res-title" style="color: #FFD700;">🏆 RESULTADO FINAL</h2>
-            <h1 id="winner-name">-</h1>
+            <div id="res-title">🏆 RESULTADO FINAL</div>
+            <div id="winner-name">-</div>
             <p id="winner-msg">Actualizando el Ranking Global...</p>
         </div>
     </div>
 
+    <!-- Room Selector -->
     <div id="room-selector" class="container">
-        <h2>⚔️ PANEL DE BATALLA</h2>
-        <div style="border: 1px solid #333; padding: 15px; border-radius: 10px; margin-bottom: 20px; background: #222;">
-            <p>Configurar Batalla (Solo Host)</p>
+        <h2>⚔️ Panel de Batalla</h2>
+
+        <div class="setup-box">
+            <p>Configurar Batalla — Solo Host</p>
             <select id="ft-limit">
                 <option value="3">First To 3</option>
                 <option value="5">First To 5</option>
                 <option value="10">First To 10</option>
             </select>
-            <button class="btn-entrar" onclick="crearSala()">CREAR NUEVA SALA</button>
+            <button class="btn-entrar" onclick="crearSala()">🔥 CREAR NUEVA SALA</button>
         </div>
-        <input type="text" id="room-id-input" placeholder="Pegar ID de Sala">
-        <button style="background:#444; color:white; width:85%;" onclick="unirseASala()">UNIRSE A BATALLA</button>
+
+        <input type="text" id="room-id-input" placeholder="Pegar ID de Sala para unirte">
+        <button class="btn-join" onclick="unirseASala()">⚡ UNIRSE A BATALLA</button>
     </div>
 
+    <!-- Battle Room -->
     <div id="battle-room" class="container" style="display: none;">
-        <small style="color:#888">ID DE SALA (Toca para copiar):</small>
-        <h3 id="display-room-id" style="color:#FFD700; cursor:pointer; margin: 5px 0 20px 0;" onclick="copiarID()">-</h3>
-        
-        <div style="display: flex; justify-content: space-between; gap: 10px;">
+        <small style="color: var(--text-muted); font-family: var(--font-mono); font-size: 0.65rem; letter-spacing: 2px; text-transform: uppercase; display: block; text-align: center;">ID de Sala — Toca para copiar</small>
+        <button id="display-room-id" onclick="copiarID()">-</button>
+
+        <div class="players-row">
             <div class="player-card">
-                <h4 id="name-p1" style="margin:0; color:#aaa;">P1</h4>
+                <h4 id="name-p1">P1</h4>
                 <div class="score" id="score-p1">0</div>
-                <button id="add-p1" class="btn-puntos" onclick="sumarPunto('s1')">+</button>
-                <button id="add-p1" class="btn-puntos" onclick="restarPunto('s1')">-</button>
+                <button id="add-p1-plus" class="btn-puntos" onclick="sumarPunto('s1')">＋</button>
+                <button id="add-p1-minus" class="btn-puntos" onclick="restarPunto('s1')">－</button>
             </div>
             <div class="player-card">
-                <h4 id="name-p2" style="margin:0; color:#aaa;">P2</h4>
+                <h4 id="name-p2">P2</h4>
                 <div class="score" id="score-p2">0</div>
-                <button id="add-p2" class="btn-puntos" onclick="sumarPunto('s2')">+</button>
-                <button id="add-p2" class="btn-puntos" onclick="restarPunto('s2')">-</button>
+                <button id="add-p2-plus" class="btn-puntos" onclick="sumarPunto('s2')">＋</button>
+                <button id="add-p2-minus" class="btn-puntos" onclick="restarPunto('s2')">－</button>
             </div>
         </div>
 
-        <div id="status-bar" style="background:#000; padding:10px; border-radius:8px; margin-top:15px; border:1px solid #333;">
-            <p id="status-msg" style="margin:0; font-size:0.9rem;">Esperando oponente...</p>
+        <div id="status-bar">
+            <p id="status-msg">Esperando oponente...</p>
         </div>
-        
-        <button onclick="abandonarSala()" style="color: #ff4444; background:none; text-decoration:underline; margin-top:20px; font-size:0.8rem;">ABANDONAR / FINALIZAR PELEA</button>
+
+        <button onclick="abandonarSala()" class="btn-abandon">Abandonar / Finalizar Pelea</button>
     </div>
 
-    <script>
-        // CONFIGURACIÓN: Credenciales para conectar con tu base de datos de Firebase
-        const firebaseConfig = {
-            apiKey: "AIzaSyD_eT9VlLk_b1toTcva8w9NwU-FGjrEtEI",
-            authDomain: "ranking-dbz-bt3.firebaseapp.com",
-            databaseURL: "https://ranking-dbz-bt3-default-rtdb.firebaseio.com",
-            projectId: "ranking-dbz-bt3",
-            storageBucket: "ranking-dbz-bt3.firebasestorage.app",
-            messagingSenderId: "228731370543",
-            appId: "1:228731370543:web:ff3e418be283b6387edada"
-        };
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.database();
-
-        // VARIABLES GLOBALES: Datos temporales de la sesión actual
-        let miNombre = localStorage.getItem("logged_user") || "Invitado";
-        let salaId = "";
-        let miRol = "";
-        let finalizado = false;
-
-        /**
-         * FUNCIÓN: crearSala
-         * Crea un nuevo registro en Firebase con los ajustes de la batalla.
-         */
-        function crearSala() {
-            const ft = parseInt(document.getElementById('ft-limit').value);
-            const ref = db.ref('salas').push(); // Genera un ID único automáticamente
-            salaId = ref.key; 
-            miRol = "p1"; // El creador siempre es el Jugador 1
-            ref.set({ 
-                p1: miNombre, s1: 0, o1: true, 
-                p2: "Esperando...", s2: 0, o2: false, 
-                ft: ft, activa: true 
-            });
-            // Si el creador cierra la web, se marca como offline automáticamente
-            ref.onDisconnect().update({ o1: false }); 
-            iniciar();
-        }
-
-        /**
-         * FUNCIÓN: unirseASala
-         * Busca una sala existente por su ID y registra al segundo jugador.
-         */
-        function unirseASala() {
-            salaId = document.getElementById('room-id-input').value.trim();
-            if(!salaId) return;
-            const ref = db.ref('salas/' + salaId);
-            ref.once('value', snap => {
-                const d = snap.val();
-                if(!d || (d.p2 !== "Esperando..." && d.p2 !== miNombre)) return alert("Sala no disponible");
-                miRol = "p2"; // Quien se une es el Jugador 2
-                db.ref(`salas/${salaId}/o2`).onDisconnect().set(false);
-                ref.update({ p2: miNombre, o2: true });
-                iniciar();
-            });
-        }
-
-        /**
-         * FUNCIÓN: iniciar
-         * Oculta el menú, muestra la sala y activa el "oído" (listener) de Firebase.
-         * Se ejecuta cada vez que algo cambia en la base de datos de esta sala.
-         */
-        function iniciar() {
-            document.getElementById('room-selector').style.display = "none";
-            document.getElementById('battle-room').style.display = "block";
-            document.getElementById('display-room-id').innerText = salaId;
-
-            db.ref('salas/' + salaId).on('value', snap => {
-                const data = snap.val();
-                if(!data) return;
-
-                // Actualiza los textos y puntos en pantalla con los datos reales de la DB
-                document.getElementById('score-p1').innerText = data.s1;
-                document.getElementById('score-p2').innerText = data.s2;
-                document.getElementById('name-p1').innerText = data.p1;
-                document.getElementById('name-p2').innerText = data.p2;
-
-                const hayRival = (data.p2 !== "Esperando...");
-                const ambosOnline = data.o1 && data.o2;
-                
-                // Los botones solo funcionan si ambos están conectados a la vez
-                document.getElementById('add-p1').disabled = !ambosOnline;
-                document.getElementById('add-p2').disabled = !ambosOnline;
-
-                if (hayRival) {
-                    document.getElementById('status-msg').innerText = ambosOnline ? `PELEANDO A FT ${data.ft}` : "CONEXIÓN PERDIDA - FINALIZANDO...";
-                    
-                    // CONDICIÓN DE CIERRE: ¿Alguien se fue o alguien llegó al límite de puntos (FT)?
-                    const rivalSeFue = (miRol === 'p1' && !data.o2) || (miRol === 'p2' && !data.o1);
-                    const victoriaPorPuntos = data.s1 >= data.ft || data.s2 >= data.ft;
-
-                    if ((rivalSeFue || victoriaPorPuntos) && !finalizado) {
-                        finalizado = true;
-                        if(rivalSeFue) alert("Tu oponente se ha retirado. Se guardarán los resultados actuales.");
-                        db.ref('salas/' + salaId).off(); // Apagamos el listener para no repetir procesos
-                        procesarFinal(data);
-                    }
-                }
-            });
-        }
-
-        /**
-         * FUNCIÓN: sumarPunto
-         * Usa una "transacción" para sumar 1 al marcador.
-         * La transacción evita errores si ambos jugadores clickean al mismo tiempo.
-         */
-        function sumarPunto(key) {
-            db.ref('salas/' + salaId).child(key).transaction(current => (current || 0) + 1);
-        }
-        function restarPunto(key) {
-        db.ref('salas/' + salaId).child(key).transaction(current => {
-        // Si el valor actual es mayor a 0, resta 1. Si ya es 0, lo deja en 0.
-        return (current > 0) ? current - 1 : 0;
-        });
-        }
-        
-        /**
-         * FUNCIÓN: procesarFinal
-         * Determina quién ganó y decide quién es el encargado de subir los puntos.
-         */
-        function procesarFinal(data) {
-            let ganador = "Empate";
-            if (data.s1 > data.s2 || (data.o2 === false && data.s1 >= data.s2)) ganador = data.p1;
-            else if (data.s2 > data.s1 || (data.o1 === false && data.s2 >= data.s1)) ganador = data.p2;
-
-            document.getElementById('winner-name').innerText = ganador;
-            document.getElementById('winner-overlay').style.display = "flex";
-
-            // Solo uno de los dos (el que siga online) debe ejecutar la subida de puntos para no duplicarlos
-            const soyElEncargado = (miRol === 'p1' && data.o1) || (miRol === 'p2' && data.o2);
-            
-            if (soyElEncargado) {
-                subirDatosRanking(data);
-            } else {
-                setTimeout(() => window.location.href = 'index.html', 3000);
-            }
-        }
-
-        /**
-         * FUNCIÓN: subirDatosRanking
-         * Lógica matemática de ELO. Actualiza victorias, derrotas, rachas e historial global.
-         */
-        function subirDatosRanking(data) {
-            db.ref('/').once('value', snap => {
-                const base = snap.val();
-                let players = base.players || [];
-                let history = base.history || [];
-                
-                let p1 = players.find(p => p.name === data.p1);
-                let p2 = players.find(p => p.name === data.p2);
-
-                if (p1 && p2) {
-                    // Ajuste de marcador por si hubo abandono
-                    let s1 = data.s1, s2 = data.s2;
-                    if (data.o1 === false && s2 <= s1) s2 = s1 + 1;
-                    if (data.o2 === false && s1 <= s2) s1 = s2 + 1;
-
-                    const winObj = s1 > s2 ? p1 : p2;
-                    const loseObj = s1 > s2 ? p2 : p1;
-
-                    // Cálculo de puntos ELO (Sistema competitivo)
-                    const K = 32;
-                    const prob = 1 / (1 + Math.pow(10, (loseObj.elo - winObj.elo) / 400));
-                    const pts = Math.round(K * (1 - prob));
-
-                    // Actualizar estadísticas del Ganador
-                    winObj.elo += pts; winObj.wins++;
-                    winObj.streak = (winObj.streak > 0) ? winObj.streak + 1 : 1;
-                    
-                    // Actualizar estadísticas del Perdedor
-                    loseObj.elo = Math.max(0, loseObj.elo - pts); loseObj.losses++;
-                    loseObj.streak = (loseObj.streak < 0) ? loseObj.streak - 1 : -1;
-
-                    // Agregar al historial de peleas
-                    history.unshift({ p1: data.p1, p2: data.p2, s1: s1, s2: s2, date: Date.now() });
-
-                    // Guardar todo de vuelta en Firebase
-                    db.ref('players').set(players);
-                    db.ref('history').set(history.slice(0, 100));
-                }
-
-                // Borrar la sala para que no ocupe espacio y volver al inicio
-                setTimeout(() => {
-                    db.ref('salas/' + salaId).remove();
-                    window.location.href = 'index.html';
-                }, 2000);
-            });
-        }
-
-        /**
- * FUNCIÓN: abandonarSala
- * Permite salir de la sala. Si el jugador está solo, borra la sala y sale.
- * Si hay rival, inicia el proceso de finalización técnica.
- */
-function abandonarSala() {
-    if (confirm("¿Quieres finalizar la batalla ahora?")) {
-        const refSala = db.ref('salas/' + salaId);
-        
-        refSala.once('value', snap => {
-            const data = snap.val();
-            if (!data) return;
-
-            const estaSolo = (data.p2 === "Esperando...");
-
-            if (estaSolo) {
-                // Si estás solo: Limpiar base de datos y salir de inmediato
-                refSala.remove().then(() => {
-                    window.location.href = 'index.html';
-                });
-            } else {
-                // Si hay rival: Marcar desconexión para que el sistema procese el final
-                db.ref(`salas/${salaId}/${miRol === 'p1' ? 'o1' : 'o2'}`).set(false);
-            }
-        });
-    }
-}
-
-        /**
-         * FUNCIÓN: copiarID
-         * Utilidad para copiar el ID de la sala y pasárselo a un amigo.
-         */
-        function copiarID() {
-            navigator.clipboard.writeText(salaId);
-            alert("ID de Sala copiado al portapapeles");
-        }
-    </script>
+    <script src="js/sala.js"></script>
 </body>
+
 </html>

@@ -1,117 +1,64 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
-    <title>Registro de Guerrero - DBZ BT3</title>
-    <style>
-        body { font-family: 'Arial', sans-serif; background: #0d0d0d; color: white; text-align: center; padding-top: 50px; margin: 0; }
-        .reg-card { background: #1a1a1a; padding: 30px; border-radius: 15px; display: inline-block; border: 1px solid #FFD700; width: 340px; box-shadow: 0 0 15px rgba(255, 215, 0, 0.2); }
-        h2 { color: #FFD700; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px; }
-        input, select, button { width: 100%; padding: 12px; margin-top: 15px; border-radius: 8px; border: 1px solid #333; font-size: 1rem; box-sizing: border-box; }
-        input, select { background: #000; color: white; outline: none; transition: 0.3s; }
-        input:focus, select:focus { border-color: #FFD700; box-shadow: 0 0 5px rgba(255, 215, 0, 0.3); }
-        button { background: #FFD700; color: black; font-weight: bold; cursor: pointer; border: none; margin-top: 25px; transition: 0.3s; }
-        button:hover { background: #ffcc00; transform: scale(1.02); }
-        .link { margin-top: 20px; display: block; color: #888; text-decoration: none; font-size: 0.9rem; }
-        .link:hover { color: #FFD700; }
-        .instruccion { color: #666; font-size: 0.8rem; margin-bottom: 10px; }
-    </style>
-</head>
-<body>
-
-    <div class="reg-card">
-        <h2>Nuevo Guerrero</h2>
-        <p class="instruccion">Completa tus datos para el Ranking</p>
-        
-        <input type="text" id="regNombre" placeholder="Nombre de Jugador">
-        
-        <select id="regPais">
-            <option value="" disabled selected>Selecciona tu país</option>
-            <option value="ARGENTINA">Argentina 🇦🇷</option>
-            <option value="PERÚ">Perú 🇵🇪</option>
-            <option value="PARAGUAY">Paraguay 🇵🇾</option>
-            <option value="CHILE">Chile 🇨🇱</option>
-            <option value="URUGUAY">Uruguay 🇺🇾</option>
-            <option value="BRASIL">Brasil 🇧🇷</option>   <!-- ← AGREGA ESTA LÍNEA -->
-            <option value="VENEZUELA">Venezuela 🇻🇪</option>  <!-- ← Línea nueva para Venezuela -->
-        </select>
-
-        <input type="password" id="regPin" placeholder="Contraseña (mín. 6 caracteres)">
-        <input type="password" id="regPinConf" placeholder="Confirma tu contraseña">
-
-        <button onclick="registrarJugador()">CREAR PERFIL</button>
-        
-        <a href="login.html" class="link">¿Ya tienes cuenta? Inicia sesión</a>
-    </div>
-
+    <title>Registro de Guerrero — DBZ BT3</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="css/login.css">
+    <link rel="stylesheet" href="css/registro.css">
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
+    <script src="utils/firebase-config.js"></script>
+</head>
 
-    <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyD_eT9VlLk_b1toTcva8w9NwU-FGjrEtEI",
-            authDomain: "ranking-dbz-bt3.firebaseapp.com",
-            databaseURL: "https://ranking-dbz-bt3-default-rtdb.firebaseio.com",
-            projectId: "ranking-dbz-bt3",
-            storageBucket: "ranking-dbz-bt3.firebasestorage.app",
-            messagingSenderId: "228731370543",
-            appId: "1:228731370543:web:ff3e418be283b6387edada"
-        };
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.database();
+<body>
 
-        function registrarJugador() {
-            const nombre = document.getElementById("regNombre").value.trim();
-            const pais = document.getElementById("regPais").value;
-            const pin = document.getElementById("regPin").value;
-            const pinConf = document.getElementById("regPinConf").value;
+    <div class="login-card">
+        <div class="auth-logo">⚡ DBZ BT3</div>
+        <h2>Nuevo Guerrero</h2>
+        <p class="auth-subtitle">Únete al Torneo Competitivo</p>
 
-            // Validaciones básicas
-            if (!nombre || !pais) return alert("Por favor, ingresa nombre y país.");
-            if (pin.length < 6) return alert("La contraseña debe ser de al menos 6 caracteres.");
-            if (pin !== pinConf) return alert("Las contraseñas no coinciden.");
+        <div class="input-group">
+            <label class="input-label" for="regNombre">Nombre de Guerrero</label>
+            <input type="text" id="regNombre" placeholder="Tu nombre en el ranking...">
+        </div>
 
-            // Leemos la lista completa para no borrar a los demás
-            db.ref('players').once('value', snap => {
-                let players = snap.val();
-                
-                // Si Firebase devuelve un objeto por error, lo convertimos a array
-                if (players && !Array.isArray(players)) {
-                    players = Object.values(players);
-                }
-                players = players || [];
+        <div class="input-group">
+            <label class="input-label" for="regPais">País</label>
+            <select id="regPais">
+                <option value="" disabled selected>Selecciona tu país</option>
+                <option value="ARGENTINA">Argentina 🇦🇷</option>
+                <option value="PERÚ">Perú 🇵🇪</option>
+                <option value="PARAGUAY">Paraguay 🇵🇾</option>
+                <option value="CHILE">Chile 🇨🇱</option>
+                <option value="URUGUAY">Uruguay 🇺🇾</option>
+                <option value="BRASIL">Brasil 🇧🇷</option>
+                <option value="VENEZUELA">Venezuela 🇻🇪</option>
+            </select>
+        </div>
 
-                // Validar si ya existe
-                const existe = players.some(p => p.name.toLowerCase() === nombre.toLowerCase());
+        <div class="input-group">
+            <label class="input-label" for="regPin">Contraseña</label>
+            <input type="password" id="regPin" placeholder="Mínimo 6 caracteres...">
+        </div>
 
-                if (existe) {
-                    alert("Este nombre ya está en uso. Elige otro.");
-                } else {
-                    // Creamos el nuevo objeto sincronizado con la lógica de ADMIN
-                    const nuevoJugador = {
-                        name: nombre,
-                        country: pais,
-                        password: pin, // Cambiado de 'pin' a 'password' para que el Login lo reconozca
-                        elo: 500,
-                        wins: 0,
-                        losses: 0,
-                        streak: 0
-                    };
+        <div class="input-group">
+            <label class="input-label" for="regPinConf">Confirmar Contraseña</label>
+            <input type="password" id="regPinConf" placeholder="Repite tu contraseña...">
+        </div>
 
-                    // Agregamos al array y guardamos la lista completa
-                    players.push(nuevoJugador);
-                    
-                    db.ref('players').set(players).then(() => {
-                        alert("¡Registro exitoso, Guerrero! Ahora puedes iniciar sesión.");
-                        window.location.href = 'login.html';
-                    }).catch(err => {
-                        alert("Error al registrar: " + err.message);
-                    });
-                }
-            });
-        }
-    </script>
+        <button onclick="registrarJugador()">🔥 CREAR PERFIL DE GUERRERO</button>
+
+        <div class="register-text">
+            <a href="login.html">¿Ya tienes cuenta? Inicia sesión</a>
+        </div>
+    </div>
+
+    <script src="js/registro.js"></script>
 </body>
 
 </html>
-

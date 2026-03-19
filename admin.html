@@ -2,1051 +2,118 @@
 <html lang="es">
 
 <head>
-  <meta charset="UTF-8">
-  <title>Admin Ranking DBZ BT3</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-
-  <script>
-    // --- PROTECCIÓN DE ACCESO AL PANEL ---
-    (function () {
-      const claveCorrecta = "Vicky321tyler";
-      const sesion = sessionStorage.getItem("admin_auth");
-
-      if (sesion !== "true") {
-        const password = prompt("Seguridad: Ingrese la clave de administrador para acceder al panel:");
-        if (password === claveCorrecta) {
-          sessionStorage.setItem("admin_auth", "true");
-        } else {
-          alert("Acceso denegado.");
-          window.location.href = 'index.html';
-        }
-      }
-    })();
-  </script>
-
-  <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-auth-compat.js"></script>
-
-  <style>
-    body {
-        font-family: Arial, sans-serif;
-        background: #0d0d0d;
-        color: #fff;
-        padding: 10px;
-        margin: 0;
-    }
-
-    h1, h2 {
-        text-align: center;
-        margin: 10px 0;
-    }
-
-    section {
-        background: #1a1a1a;
-        padding: 12px;
-        margin-bottom: 10px;
-        border-radius: 12px;
-    }
-
-    input, button, select {
-        width: 100%;
-        padding: 10px;
-        margin: 5px 0;
-        border-radius: 8px;
-        border: none;
-        font-size: 1rem;
-        box-sizing: border-box;
-    }
-
-    button {
-        background: #03a9f4;
-        color: #000;
-        cursor: pointer;
-        font-weight: bold;
-    }
-
-    button:hover {
-        opacity: 0.85;
-    }
-
-    select {
-        background: #333;
-        color: #fff;
-        cursor: pointer;
-    }
-
-    table {
-        width: 100%;
-        border-collapse: collapse;
-        font-size: 0.85rem;
-    }
-
-    th, td {
-        padding: 12px 5px;
-        border-bottom: 1px solid #333;
-        text-align: center;
-    }
-
-    th {
-        background: #222;
-        color: #bbb;
-        font-size: 0.75rem;
-        text-transform: uppercase;
-    }
-
-    .rank-col {
-        color: #FFD700;
-        font-weight: bold;
-        width: 30px;
-    }
-
-    .player-name-col {
-        text-align: left;
-        padding-left: 10px;
-        font-weight: bold;
-    }
-
-    .rank-S { color: #FFD700; font-weight: bold; }
-    .rank-A { color: #FF5252; font-weight: bold; }
-    .rank-B { color: #4CAF50; font-weight: bold; }
-    .rank-C { color: #03A9F4; font-weight: bold; }
-    .rank-D { color: #BDBDBD; font-weight: bold; }
-    .rank-E { color: #9E9E9E; font-weight: bold; }
-
-    .player-flag {
-        width: 22px;
-        height: 15px;
-        object-fit: cover;
-        display: block;
-        margin: auto;
-        border-radius: 2px;
-    }
-
-    .del-btn, .edit-btn {
-        background: transparent;
-        border: none;
-        cursor: pointer;
-        opacity: 0.5;
-        width: auto;
-        display: inline-block;
-    }
-
-    .del-btn:hover, .edit-btn:hover {
-        opacity: 1;
-    }
-
-    .log-container {
-        display: flex;
-        flex-direction: column;
-        gap: 4px;
-    }
-
-    .log {
-        background: #111;
-        padding: 10px 12px;
-        border-radius: 6px;
-        font-size: 0.85rem;
-        display: flex;
-        align-items: center;
-    }
-
-    .log-num {
-        color: #FFD700;
-        font-weight: bold;
-        width: 35px;
-    }
-
-    .log-content {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        flex: 1;
-    }
-
-    .log-score {
-        width: 60px;
-        text-align: center;
-        color: #aaa;
-        font-weight: bold;
-    }
-
-    .win { color: #4CAF50; font-weight: bold; }
-    .loss { color: #F44336; font-weight: bold; }
-
-    /* Paginación limpia y responsiva */
-    .pagination {
-        text-align: center;
-        margin: 20px 0;
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
-        align-items: center;
-        gap: 8px;
-        max-width: 100%;
-        padding: 0 10px;
-        box-sizing: border-box;
-    }
-
-    .pagination button {
-        min-width: 36px;
-        height: 36px;
-        padding: 0 10px;
-        border-radius: 6px;
-        border: 1px solid #FFD700;
-        background: #111;
-        color: #FFD700;
-        font-weight: bold;
-        cursor: pointer;
-        transition: all 0.2s;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .pagination button.active {
-        background: #FFD700;
-        color: #111;
-    }
-
-    .pagination button:disabled {
-        opacity: 0.4;
-        cursor: not-allowed;
-        background: #222;
-    }
-
-    .pagination span {
-        padding: 0 8px;
-        color: #FFD700;
-        font-size: 1.1rem;
-        align-self: center;
-    }
-
-    @media (max-width: 600px) {
-        .pagination {
-            gap: 6px;
-            padding: 0 5px;
-        }
-        .pagination button {
-            min-width: 32px;
-            height: 32px;
-            padding: 0 8px;
-            font-size: 0.9rem;
-        }
-        .pagination span {
-            padding: 0 6px;
-            font-size: 1rem;
-        }
-    }
-
-    .modal {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.8);
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        z-index: 100;
-    }
-
-    .hidden {
-        display: none;
-    }
-
-    .modal-content {
-        background: #222;
-        padding: 20px;
-        border-radius: 12px;
-        width: 80%;
-        max-width: 300px;
-    }
-</style>
-<head>
-  <meta charset="UTF-8">
-  <title>Admin Ranking DBZ BT3</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-
-  <script>
-    // --- PROTECCIÓN DE ACCESO AL PANEL ---
-    (function () {
-      const claveCorrecta = "Vicky321tyler";
-      const sesion = sessionStorage.getItem("admin_auth");
-
-      if (sesion !== "true") {
-        const password = prompt("Seguridad: Ingrese la clave de administrador para acceder al panel:");
-        if (password === claveCorrecta) {
-          sessionStorage.setItem("admin_auth", "true");
-        } else {
-          alert("Acceso denegado.");
-          window.location.href = 'index.html';
-        }
-      }
-    })();
-  </script>
-
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #0d0d0d;
-      color: #fff;
-      padding: 10px;
-      margin: 0;
-    }
-
-    h1,
-    h2 {
-      text-align: center;
-      margin: 10px 0;
-    }
-
-    section {
-      background: #1a1a1a;
-      padding: 12px;
-      margin-bottom: 10px;
-      border-radius: 12px;
-    }
-
-    input,
-    button,
-    select {
-      width: 100%;
-      padding: 10px;
-      margin: 5px 0;
-      border-radius: 8px;
-      border: none;
-      font-size: 1rem;
-      box-sizing: border-box;
-    }
-
-    button {
-      background: #03a9f4;
-      color: #000;
-      cursor: pointer;
-      font-weight: bold;
-    }
-
-    button:hover {
-      opacity: .85
-    }
-
-    select {
-      background: #333;
-      color: #fff;
-      cursor: pointer;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 0.85rem;
-    }
-
-    th,
-    td {
-      padding: 12px 5px;
-      border-bottom: 1px solid #333;
-      text-align: center;
-    }
-
-    th {
-      background: #222;
-      color: #bbb;
-      font-size: 0.75rem;
-      text-transform: uppercase;
-    }
-
-    .rank-col {
-      color: #FFD700;
-      font-weight: bold;
-      width: 30px;
-    }
-
-    .player-name-col {
-      text-align: left;
-      padding-left: 10px;
-      font-weight: bold;
-    }
-
-    .rank-S {
-      color: #FFD700;
-      font-weight: bold;
-    }
-
-    .rank-A {
-      color: #FF5252;
-      font-weight: bold;
-    }
-
-    .rank-B {
-      color: #4CAF50;
-      font-weight: bold;
-    }
-
-    .rank-C {
-      color: #03A9F4;
-      font-weight: bold;
-    }
-
-    .rank-D {
-      color: #BDBDBD;
-      font-weight: bold;
-    }
-
-    .rank-E {
-      color: #9E9E9E;
-      font-weight: bold;
-    }
-
-    .player-flag {
-      width: 22px;
-      height: 15px;
-      object-fit: cover;
-      display: block;
-      margin: auto;
-      border-radius: 2px;
-    }
-
-    .del-btn,
-    .edit-btn {
-      background: transparent;
-      border: none;
-      cursor: pointer;
-      opacity: 0.5;
-      width: auto;
-      display: inline-block;
-    }
-
-    .del-btn:hover,
-    .edit-btn:hover {
-      opacity: 1;
-    }
-
-    .log-container {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
-
-    .log {
-      background: #111;
-      padding: 10px 12px;
-      border-radius: 6px;
-      font-size: 0.85rem;
-      display: flex;
-      align-items: center;
-    }
-
-    .log-num {
-      color: #FFD700;
-      font-weight: bold;
-      width: 35px;
-    }
-
-    .log-content {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      flex: 1;
-    }
-
-    .log-score {
-      width: 60px;
-      text-align: center;
-      color: #aaa;
-      font-weight: bold;
-    }
-
-    .win {
-      color: #4CAF50;
-      font-weight: bold
-    }
-
-    .loss {
-      color: #F44336;
-      font-weight: bold
-    }
-
-    .pagination {
-      text-align: center;
-      margin-top: 10px;
-      display: flex;
-      justify-content: center;
-      gap: 8px;
-    }
-
-    .pagination button {
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      border: 2px solid #FFD700;
-      background: #111;
-      color: #FFD700;
-      cursor: pointer;
-    }
-
-    .pagination button.active {
-      background: #FFD700;
-      color: #111;
-    }
-
-    .modal {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.8);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      z-index: 100;
-    }
-
-    .hidden {
-      display: none;
-    }
-
-    .modal-content {
-      background: #222;
-      padding: 20px;
-      border-radius: 12px;
-      width: 80%;
-      max-width: 300px;
-    }
-
-    .pagination {
-    text-align: center;
-    margin-top: 15px;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 6px; /* más chico en móvil */
-    max-width: 100%;
-    overflow-x: auto; /* scroll horizontal si se pasa en móvil muy pequeño */
-    }
-    
-    .pagination button {
-        padding: 8px 12px;
-        min-width: 40px;
-        border-radius: 5px;
-        border: 1px solid #FFD700;
-        background: #111;
-        color: #FFD700;
-        font-weight: bold;
-        cursor: pointer;
-        transition: all 0.2s;
-    }
-    
-    .pagination button:disabled {
-        opacity: 0.5;
-        cursor: not-allowed;
-    }
-    
-    @media (max-width: 480px) {
-        .pagination button {
-            padding: 6px 10px;
-            font-size: 0.9rem;
-            min-width: 36px;
-        }
-        .pagination span {
-            padding: 6px 8px;
-            font-size: 0.9rem;
-        }
-    }
-    
-  </style>
+    <meta charset="UTF-8">
+    <title>Admin Panel | Ranking DBZ BT3</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="css/index.css"> <!-- Importar estilos de tabla, rango y botones -->
+    <link rel="stylesheet" href="css/admin.css">
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-auth-compat.js"></script>
+    <script src="utils/firebase-config.js"></script>
+    <script src="utils/constants.js"></script>
 </head>
 
 <body>
+    <div class="container">
+        <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+            <a href="index.html" class="back-link">
+                <span>← VOLVER AL RANKING</span>
+            </a>
+            <button onclick="sessionStorage.removeItem('admin_auth'); window.location.href='index.html'" class="btn-logout">
+                SALIR DEL PANEL
+            </button>
+        </div>
+        <h1>👑 PANEL ADMIN</h1>
 
-  <h1>👑 ADMIN PANEL</h1>
+        <section class="admin-section">
+            <h2>➕ Agregar Jugador</h2>
+            <div class="input-row">
+                <input id="playerName" placeholder="Nombre en el juego">
+                <input id="playerPass" type="password" placeholder="Contraseña (mín. 6 dígitos)">
+            </div>
+            <select id="playerCountry">
+                <option value="">Seleccionar País (Opcional)</option>
+                <option value="ARGENTINA">Argentina 🇦🇷</option>
+                <option value="PERÚ">Perú 🇵🇪</option>
+                <option value="PARAGUAY">Paraguay 🇵🇾</option>
+                <option value="CHILE">Chile 🇨🇱</option>
+                <option value="URUGUAY">Uruguay 🇺🇾</option>
+                <option value="BRASIL">Brasil 🇧🇷</option>
+                <option value="VENEZUELA">Venezuela 🇻🇪</option>
+                <option value="COLOMBIA">Colombia 🇨🇴</option>
+                <option value="BOLIVIA">Bolivia 🇧🇴</option>
+            </select>
+            <button class="btn-primary" onclick="addPlayer()" style="width:100%; margin-top:10px;">AGREGAR GUERRERO</button>
+        </section>
 
-  <section>
-    <h2 style="font-size: 1.1rem;">➕ Agregar jugador</h2>
-    <input id="playerName" placeholder="Nombre del jugador">
-    <input id="playerPass" type="password" placeholder="Contraseña (mín. 6 dígitos)">
-    <select id="playerCountry">
-      <option value="">Seleccionar País (Opcional)</option>
-      <option value="ARGENTINA">Argentina 🇦🇷</option>
-      <option value="PERÚ">Perú 🇵🇪</option>
-      <option value="PARAGUAY">Paraguay 🇵🇾</option>
-      <option value="CHILE">Chile 🇨🇱</option>
-      <option value="URUGUAY">Uruguay 🇺🇾</option>
-      <option value="BRASIL">Brasil 🇧🇷</option> <!-- NUEVA LÍNEA -->
-    </select>
-    <button onclick="addPlayer()">Agregar Guerrero</button>
-    <button onclick="forceRebuild()" style="background:#4CAF50; color:white; margin-top:10px;">🔄 Sincronizar y
-      Recalcular Ranking</button>
-  </section>
+        <section class="admin-section">
+            <h2>⚔️ Registrar Pelea</h2>
+            <div style="display: grid; grid-template-columns: 2fr 1fr 2fr 1fr; gap: 12px; margin-bottom: 20px;">
+                <input id="p1Input" list="playerList" placeholder="Jugador 1" style="margin: 0;">
+                <input id="s1Input" type="number" placeholder="Pts" style="margin: 0;">
+                <input id="p2Input" list="playerList" placeholder="Jugador 2" style="margin: 0;">
+                <input id="s2Input" type="number" placeholder="Pts" style="margin: 0;">
+            </div>
+            <button class="btn-primary" onclick="registerMatch()" style="width:100%;">GUARDAR RESULTADO</button>
+            <datalist id="playerList"></datalist>
+        </section>
 
-  <section>
-    <h2 style="font-size: 1.1rem;">⚔️ Registrar pelea</h2>
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-      <input id="p1Input" list="playerList" placeholder="Jugador 1">
-      <input id="s1Input" type="number" placeholder="Puntos 1">
-      <input id="p2Input" list="playerList" placeholder="Jugador 2">
-      <input id="s2Input" type="number" placeholder="Puntos 2">
+        <section class="admin-section">
+            <h2>📊 Preview del Ranking</h2>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>POS</th>
+                            <th></th>
+                            <th style="text-align:left; padding-left:10px;">GUERRERO</th>
+                            <th>RANGO</th>
+                            <th>ELO</th>
+                            <th>W/L</th>
+                            <th>RACHA</th>
+                            <th>ACCIÓN</th>
+                        </tr>
+                    </thead>
+                    <tbody id="rankingPreview"></tbody>
+                </table>
+            </div>
+            <div id="rankingPagination" class="pagination"></div>
+        </section>
+
+        <section class="admin-section">
+            <h2>📝 Últimos Resultados</h2>
+            <div id="logs" class="log-container"></div>
+            <div id="logsPagination" class="pagination"></div>
+        </section>
+
+        <section class="admin-section section-warning">
+            <h2 style="color: #ff5252; border-color: rgba(255,82,82,0.2);">🚀 Herramientas de Mantenimiento</h2>
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 15px;">
+                Si tienes datos antiguos guardados en este navegador (`localStorage`), puedes subirlos a la nube. 
+                <br><strong style="color: #ff5252;">Atención: Esto reemplazará los datos de la base de datos en vivo.</strong>
+            </p>
+            <button class="btn-danger" onclick="migrarDatosLocales()">🔥 MIGRAR DATOS LOCALES A LA NUBE</button>
+        </section>
     </div>
-    <button onclick="registerMatch()">Guardar resultado</button>
-    <div id="confirm"></div>
-    <datalist id="playerList"></datalist>
-  </section>
 
-  <section>
-    <h2 style="font-size: 1.1rem;">📊 Ranking (preview)</h2>
-    <table>
-      <thead>
-        <tr>
-          <th>Pos</th>
-          <th>🌐</th>
-          <th style="text-align:left; padding-left:10px;">Jugador</th>
-          <th>Rango</th>
-          <th>ELO</th>
-          <th>W/L</th>
-          <th>Racha</th>
-          <th>Acción</th>
-        </tr>
-      </thead>
-      <tbody id="rankingPreview"></tbody>
-    </table>
-    <div id="rankingPagination" class="pagination"></div>
-  </section>
-
-  <section>
-    <h2 style="font-size: 1.1rem;">📝 Últimos resultados</h2>
-    <div id="logs" class="log-container"></div>
-    <div id="logsPagination" class="pagination"></div>
-  </section>
-
-  <div id="editModal" class="modal hidden">
-    <div class="modal-content">
-      <h3 style="text-align:center;">✏️ Editar resultado</h3>
-      <input id="editS1" type="number" placeholder="Puntos 1">
-      <input id="editS2" type="number" placeholder="Puntos 2">
-      <button onclick="saveEdit()">Guardar cambios</button>
-      <button onclick="closeEdit()" style="background:#444; color: white;">Cancelar</button>
+    <!-- Modal Editar -->
+    <div id="editModal" class="modal hidden">
+        <div class="modal-content" style="max-width: 400px; text-align: center;">
+            <h3 style="font-family: var(--font-display); color: var(--gold); margin: 0 0 20px 0; letter-spacing: 2px;">✏️ EDITAR RESULTADO</h3>
+            <div style="display: flex; gap: 12px; margin-bottom: 24px;">
+                <input id="editS1" type="number" placeholder="Puntos 1" style="margin: 0;">
+                <input id="editS2" type="number" placeholder="Puntos 2" style="margin: 0;">
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 12px;">
+                <button class="btn-primary" onclick="saveEdit()" style="margin: 0; width: 100%;">GUARDAR CAMBIOS</button>
+                <button onclick="closeEdit()" style="margin: 0; width: 100%; background: rgba(255,255,255,0.05); color: var(--text-primary); border: 1px solid var(--border-subtle); padding: 14px 28px; border-radius: 10px; font-family: var(--font-display); text-transform: uppercase; font-size: 0.85rem; font-weight: 700; cursor: pointer; transition: 0.2s;">CANCELAR</button>
+            </div>
+        </div>
     </div>
-  </div>
 
-  <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyD_eT9VlLk_b1toTcva8w9NwU-FGjrEtEI",
-      authDomain: "ranking-dbz-bt3.firebaseapp.com",
-      databaseURL: "https://ranking-dbz-bt3-default-rtdb.firebaseio.com",
-      projectId: "ranking-dbz-bt3",
-      storageBucket: "ranking-dbz-bt3.firebasestorage.app",
-      messagingSenderId: "228731370543",
-      appId: "1:228731370543:web:ff3e418be283b6387edada"
-    };
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
-    const auth = firebase.auth();
-
-    // Función para autenticar al cargar la página
-    function autenticarAdmin() {
-      if (sessionStorage.getItem("admin_auth") === "true") {
-        auth.signInAnonymously()
-          .then(() => console.log("Admin autenticado automáticamente"))
-          .catch(err => console.error("Error en auto-auth:", err));
-        return;
-      }
-
-      const password = prompt("Clave de administrador:");
-      if (password === "Vicky321tyler") {
-        sessionStorage.setItem("admin_auth", "true");
-        auth.signInAnonymously()
-          .then(() => console.log("Admin autenticado correctamente"))
-          .catch(err => console.error("Error al autenticar:", err));
-      } else {
-        alert("Clave incorrecta");
-        window.location.href = 'index.html';
-      }
-    }
-
-    // Llamar a la autenticación al cargar
-    autenticarAdmin();
-
-    let players = [], history = [];
-    let editingId = null;
-    const PAGE_SIZE = 10;
-    let currentPageLogs = 1;
-    let currentPageRanking = 1;
-    let isSaving = false; // Bandera para ignorar actualizaciones propias
-
-    const ranks = [
-      { name: "E", min: 0, max: 699, class: "rank-E" },
-      { name: "D", min: 700, max: 999, class: "rank-D" },
-      { name: "C", min: 1000, max: 1299, class: "rank-C" },
-      { name: "B", min: 1300, max: 1599, class: "rank-B" },
-      { name: "A", min: 1600, max: 1899, class: "rank-A" },
-      { name: "S", min: 1900, max: Infinity, class: "rank-S" }
-    ];
-
-    const countryByName = {
-      "DARK": "ARGENTINA", "ETR-FASTEK": "ARGENTINA", "ETR-MICKY": "ARGENTINA",
-      "MILANCO": "ARGENTINA", "KEVON": "ARGENTINA", "MORATO": "ARGENTINA",
-      "ETR-JYX": "ARGENTINA", "ANDY-PEREZ": "ARGENTINA", "CHINCHANO": "PERÚ",
-      "EMANUEL09": "PERÚ", "ETR-NOVAK": "ARGENTINA", "JNC": "PARAGUAY",
-      "BRIAN-TNK": "ARGENTINA", "MAX-FARO": "ARGENTINA", "ALEXANDER": "ARGENTINA"
-    };
-
-    function getRank(elo) { return ranks.find(r => elo >= r.min && elo <= r.max) || ranks[0]; }
-
-    function getBanderaHTML(country) {
-      if (!country) return "";
-      const banderas = {
-        "ARGENTINA": "bandera argentina.png",
-        "PERÚ": "bandera peru.png",
-        "PARAGUAY": "bandera paraguay.png",
-        "CHILE": "bandera chile.png",
-        "URUGUAY": "bandera uruguay.png"
-      };
-      return banderas[country.toUpperCase()] ? `<img src="Imagenes/${banderas[country.toUpperCase()]}" class="player-flag">` : "";
-    }
-
-    // Listener que solo se activa si estás autenticado
-    auth.onAuthStateChanged(user => {
-      if (user) {
-        console.log("Usuario autenticado, activando listener de datos");
-
-        db.ref('/').on('value', snapshot => {
-          if (isSaving) {
-            console.log("Actualización ignorada (es nuestro propio guardado)");
-            isSaving = false;
-            return; // No sobrescribimos nada
-          }
-
-          const data = snapshot.val();
-          players = data?.players || [];
-          history = data?.history || [];
-
-          history.sort((a, b) => parseInt(b.id) - parseInt(a.id));
-
-          renderAll();
-        });
-      } else {
-        console.log("No autenticado, esperando login...");
-      }
-    });
-
-    function saveCloud() {
-      console.log("Intentando guardar cambios...");
-      isSaving = true; // ← Activa la bandera para que el listener ignore esta actualización
-
-      db.ref('players').set(players || []).then(() => {
-        console.log("Players guardados OK");
-      }).catch(err => {
-        console.error("Error al guardar players:", err.message);
-        alert("Error al guardar jugadores: " + err.message);
-        isSaving = false; // Reset en caso de error
-      });
-
-      db.ref('history').set(history || []).then(() => {
-        console.log("History guardado OK");
-      }).catch(err => {
-        console.error("Error al guardar history:", err.message);
-        alert("Error al guardar historial: " + err.message);
-        isSaving = false; // Reset en caso de error
-      });
-    }
-
-    function addPlayer() {
-      const name = document.getElementById("playerName").value.trim();
-      const pass = document.getElementById("playerPass").value.trim();
-      const country = document.getElementById("playerCountry").value;
-
-      if (!name) return alert("Ingrese un nombre");
-      if (pass.length < 6) return alert("La contraseña debe tener al menos 6 dígitos");
-      if (players.find(p => p.name.toLowerCase() === name.toLowerCase())) return alert("El jugador ya existe");
-
-      players.push({
-        name: name,
-        password: pass,
-        elo: 500,
-        wins: 0,
-        losses: 0,
-        streak: 0,
-        country: country || null
-      });
-
-      document.getElementById("playerName").value = "";
-      document.getElementById("playerPass").value = "";
-      document.getElementById("playerCountry").value = "";
-      saveCloud();
-      alert("Guerrero agregado con éxito");
-    }
-
-    function deletePlayer(name) {
-      if (!confirm(`¿Eliminar a "${name}"?`)) return;
-      players = players.filter(p => p.name !== name);
-      history = history.filter(h => h.p1 !== name && h.p2 !== name);
-      rebuild();
-      saveCloud();
-    }
-
-    function deleteMatch(id) {
-      if (!confirm("¿Eliminar pelea? Esta acción recalculará el ELO y las rachas.")) return;
-
-      if (id.startsWith('temp-')) {
-        const index = parseInt(id.split('-')[1]);
-        history.splice(index, 1);
-      } else {
-        history = history.filter(h => h.id !== id);
-      }
-
-      rebuild();
-      saveCloud();
-    }
-
-    // NUEVA FUNCIÓN PARA EL BOTÓN DE SINCRONIZACIÓN
-    function forceRebuild() {
-      if (!confirm("¿Deseas recalcular todas las estadísticas basándote en el historial?")) return;
-      rebuild();
-      saveCloud();
-      alert("Ranking sincronizado correctamente.");
-    }
-
-    function rebuild() {
-      players.forEach(p => { 
-        p.elo = 500; 
-        p.wins = 0; 
-        p.losses = 0; 
-        p.streak = 0; 
-      });
-      
-      if (history.length > 0) {
-        // Procesar historial en orden cronológico (antiguo → nuevo)
-        [...history].reverse().forEach(h => {
-          const A = players.find(p => p.name === h.p1);
-          const B = players.find(p => p.name === h.p2);
-          if (A && B) {
-            const sa = parseInt(h.s1), sb = parseInt(h.s2);
-            const winner = sa > sb ? A : B;
-            const loser = sa > sb ? B : A;
-            
-            winner.wins++; 
-            loser.losses++;
-            
-            const diff = Math.abs(sa - sb);  // tu bonus por score (5-0 = 5)
-            const K = 32;  // base LoL para ranked
-            
-            // Fórmula LoL: Expected win probability
-            const expected = 1 / (1 + Math.pow(10, (loser.elo - winner.elo) / 400));
-            
-            // Ganancia/pérdida LoL + tu bonus diff score
-            const gain = K * (1 - expected) + (diff * 2);
-            const loss = K * expected + (diff * 2);
-            
-            winner.elo += Math.round(gain);
-            loser.elo = Math.max(0, Math.round(loser.elo - loss));
-          }
-        });
-        
-        // Cálculo de racha (mantiene tu lógica actual)
-        players.forEach(p => {
-          let currentStreak = 0;
-          for (const h of history) {
-            if (h.p1 !== p.name && h.p2 !== p.name) continue;
-            const won = (h.p1 === p.name && h.s1 > h.s2) || (h.p2 === p.name && h.s2 > h.s1);
-            if (currentStreak === 0) {
-              currentStreak = won ? 1 : -1;
-            } else if ((currentStreak > 0 && won) || (currentStreak < 0 && !won)) {
-              currentStreak += won ? 1 : -1;
-            } else {
-              break;
-            }
-          }
-          p.streak = currentStreak;
-        });
-      }
-    }
-
-    function registerMatch() {
-      const a = p1Input.value.trim(), b = p2Input.value.trim();
-      const sa = parseInt(s1Input.value), sb = parseInt(s2Input.value);
-      if (!a || !b || a === b || isNaN(sa) || isNaN(sb)) return alert("Datos incompletos");
-      history.unshift({ id: Date.now().toString(), p1: a, p2: b, s1: sa, s2: sb });
-      rebuild();
-      saveCloud();
-      p1Input.value = ""; s1Input.value = ""; p2Input.value = ""; s2Input.value = "";
-      document.getElementById("confirm").innerHTML = `<div style="background:#2e7d32;padding:6px;border-radius:6px;text-align:center;margin-top:5px;">✅ Guardado</div>`;
-      setTimeout(() => document.getElementById("confirm").innerHTML = "", 1000);
-    }
-
-    function renderAll() {
-      document.getElementById("playerList").innerHTML = players.map(p => `<option value="${p.name}">`).join("");
-      renderRanking();
-      renderLogs();
-    }
-
-    function renderRanking() {
-      const rankingBody = document.getElementById("rankingPreview");
-      const ordenados = [...players].sort((a, b) => b.elo - a.elo);
-      const start = (currentPageRanking - 1) * PAGE_SIZE;
-      const pagePlayers = ordenados.slice(start, start + PAGE_SIZE);
-
-      rankingBody.innerHTML = pagePlayers.map((p, i) => {
-        const bandera = getBanderaHTML(p.country || countryByName[p.name]);
-        const rachaText = p.streak > 0 ? '🔥 ' + p.streak : (p.streak < 0 ? '💀 ' + Math.abs(p.streak) : '-');
-        const r = getRank(p.elo);
-        return `<tr>
-      <td class="rank-col">${start + i + 1}°</td>
-      <td>${bandera}</td>
-      <td class="player-name-col">${p.name}</td>
-      <td><span class="${r.class}">${r.name}</span></td>
-      <td>${Math.round(p.elo)}</td>
-      <td>${p.wins}/${p.losses}</td>
-      <td>${rachaText}</td>
-      <td><button class="del-btn" onclick="deletePlayer('${p.name}')">🗑️</button></td>
-    </tr>`;
-      }).join("");
-      renderPagination("rankingPagination", ordenados.length, currentPageRanking, (p) => { currentPageRanking = p; renderRanking(); });
-    }
-
-    function renderLogs() {
-      const logsEl = document.getElementById("logs");
-      const startL = (currentPageLogs - 1) * PAGE_SIZE;
-      // Quitamos el .reverse() porque ya ordenamos en el listener
-      const pageHistory = history.slice(startL, startL + PAGE_SIZE);
-
-      logsEl.innerHTML = pageHistory.map((h, i) => {
-        const p1win = h.s1 > h.s2;
-        const currentId = h.id || `temp-${history.length - 1 - (startL + i)}`;
-
-        return `<div class="log">
-          <span class="log-num">#${startL + i + 1}</span> 
-          <div class="log-content">
-              <span class="log-p1 ${p1win ? 'win' : 'loss'}">${h.p1}</span> 
-              <span class="log-score">${h.s1} – ${h.s2}</span> 
-              <span class="log-p2 ${p1win ? 'loss' : 'win'}">${h.p2}</span>
-          </div>
-          <div class="log-actions">
-            <button class="edit-btn" onclick="openEdit('${currentId}')">✏️</button>
-            <button class="del-btn" onclick="deleteMatch('${currentId}')">🗑️</button>
-          </div>
-        </div>`;
-      }).join("");
-      renderPagination("logsPagination", history.length, currentPageLogs, (p) => { currentPageLogs = p; renderLogs(); });
-    }
-
-    function renderPagination(paginationId, totalItems, currentPageVar, pageChangeCallback) {
-        const totalPages = Math.ceil(totalItems / PAGE_SIZE);
-        const container = document.getElementById(paginationId);
-        
-        if (!container) {
-            console.warn(`No se encontró contenedor con id="${paginationId}"`);
-            return;
-        }
-        
-        container.innerHTML = "";
-        if (totalPages <= 1) return;
-    
-        const maxVisible = window.innerWidth < 768 ? 7 : 11; // más botones visibles sin texto extra
-        let startPage = Math.max(1, currentPageVar - Math.floor(maxVisible / 2));
-        let endPage = Math.min(totalPages, startPage + maxVisible - 1);
-    
-        if (endPage - startPage + 1 < maxVisible) {
-            startPage = Math.max(1, endPage - maxVisible + 1);
-        }
-    
-        // Botones de páginas
-        if (startPage > 1) {
-            const first = document.createElement("button");
-            first.innerText = "1";
-            first.onclick = () => pageChangeCallback(1);
-            container.appendChild(first);
-    
-            if (startPage > 2) {
-                const dots = document.createElement("span");
-                dots.innerText = "...";
-                dots.style.padding = "8px 12px";
-                dots.style.color = "#FFD700";
-                container.appendChild(dots);
-            }
-        }
-    
-        for (let i = startPage; i <= endPage; i++) {
-            const btn = document.createElement("button");
-            btn.innerText = i;
-            if (i === currentPageVar) btn.className = "active";
-            btn.onclick = () => pageChangeCallback(i);
-            container.appendChild(btn);
-        }
-    
-        if (endPage < totalPages) {
-            if (endPage < totalPages - 1) {
-                const dots = document.createElement("span");
-                dots.innerText = "...";
-                dots.style.padding = "8px 12px";
-                dots.style.color = "#FFD700";
-                container.appendChild(dots);
-            }
-    
-            const last = document.createElement("button");
-            last.innerText = totalPages;
-            last.onclick = () => pageChangeCallback(totalPages);
-            container.appendChild(last);
-        }
-    }
-    function openEdit(id) {
-      let h;
-      if (id.startsWith('temp-')) {
-        const index = parseInt(id.split('-')[1]);
-        h = history[index];
-      } else {
-        h = history.find(x => x.id === id);
-      }
-
-      if (!h) return;
-      editingId = id;
-      document.getElementById("editS1").value = h.s1;
-      document.getElementById("editS2").value = h.s2;
-      document.getElementById("editModal").classList.remove("hidden");
-    }
-
-    function saveEdit() {
-      let h;
-      if (editingId.startsWith('temp-')) {
-        const index = parseInt(editingId.split('-')[1]);
-        h = history[index];
-      } else {
-        h = history.find(x => x.id === editingId);
-      }
-
-      if (h) {
-        h.s1 = parseInt(document.getElementById("editS1").value);
-        h.s2 = parseInt(document.getElementById("editS2").value);
-        document.getElementById("editModal").classList.add("hidden");
-        rebuild();
-        saveCloud();
-        alert("Resultado actualizado y estadísticas recalculadas.");
-      }
-    }
-
-    function closeEdit() { document.getElementById("editModal").classList.add("hidden"); }
-
-    const btnMigrar = document.createElement("button");
-    btnMigrar.innerHTML = "🚀 MIGRAR DATOS LOCALES A LA NUBE";
-    btnMigrar.style.cssText = "background:#ff9800; margin-top:20px; color:black;";
-    btnMigrar.onclick = function () {
-      const localData = JSON.parse(localStorage.getItem("fightcade_local_data"));
-      if (localData && confirm("¿Subir datos de este navegador a Firebase?")) {
-        db.ref('/').set(localData).then(() => alert("¡Migración exitosa!"));
-      } else { alert("No hay datos locales para migrar."); }
-    };
-    document.body.appendChild(btnMigrar);
-  </script>
+    <script src="js/admin.js"></script>
 </body>
 
 </html>
-
-
-
-
-
-
-
-

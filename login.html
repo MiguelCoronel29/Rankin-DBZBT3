@@ -1,93 +1,49 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
-<meta charset="UTF-8">
-<title>Login - Ranking DBZ BT3</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-
-<script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
-
-<style>
-  body { font-family: 'Arial', sans-serif; background: #0d0d0d; color: #fff; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-  .login-card { background: #1a1a1a; padding: 35px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.7); width: 100%; max-width: 360px; text-align: center; border: 1px solid #333; }
-  h2 { color: #FFD700; margin-bottom: 25px; letter-spacing: 2px; text-transform: uppercase; }
-  input { width: 100%; padding: 14px; margin: 10px 0; border-radius: 10px; border: 1px solid #444; background: #222; color: #fff; box-sizing: border-box; font-size: 1rem; outline: none; transition: 0.3s; }
-  input:focus { border-color: #03a9f4; box-shadow: 0 0 8px rgba(3, 169, 244, 0.4); }
-  button { width: 100%; padding: 14px; margin-top: 20px; border-radius: 10px; border: none; background: #03a9f4; color: #000; font-weight: bold; cursor: pointer; font-size: 1rem; transition: 0.3s; }
-  button:hover { background: #0288d1; transform: translateY(-2px); }
-  
-  .register-text { margin-top: 25px; color: #aaa; font-size: 0.9rem; }
-  .register-text a { color: #FFD700; text-decoration: none; font-weight: bold; transition: 0.2s; }
-  .register-text a:hover { text-shadow: 0 0 10px rgba(255, 215, 0, 0.5); }
-  
-  .error { color: #ff5252; font-size: 0.85rem; margin-top: 15px; display: none; background: rgba(255, 82, 82, 0.1); padding: 8px; border-radius: 5px; }
-  .back { margin-top: 20px; display: block; color: #666; text-decoration: none; font-size: 0.85rem; }
-  .back:hover { color: #999; }
-</style>
+    <meta charset="UTF-8">
+    <title>Ingresar a la Arena — DBZ BT3</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="css/common.css">
+    <link rel="stylesheet" href="css/login.css">
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
+    <script src="utils/firebase-config.js"></script>
 </head>
+
 <body>
 
-<div class="login-card">
-  <h2>LOG IN</h2>
-  <input id="userLogin" type="text" placeholder="Nombre de Guerrero">
-  <input id="passLogin" type="password" placeholder="Contraseña">
-  
-  <button onclick="intentarLogin()">ENTRAR A LA ARENA</button>
-  
-  <div id="errorMessage" class="error">Usuario o contraseña incorrectos</div>
+    <div class="login-card">
+        <div class="auth-logo">⚡ DBZ BT3</div>
+        <h2>Ingresar</h2>
+        <p class="auth-subtitle">Accede a la arena de combate</p>
 
-  <div class="register-text">
-    ¿No tienes una cuenta? <br>
-    <a href="registro.html">Regístrate ahora</a>
-  </div>
+        <div class="input-group">
+            <label class="input-label" for="userLogin">Nombre de Guerrero</label>
+            <input id="userLogin" type="text" placeholder="Tu nombre en el ranking...">
+        </div>
 
-  <a href="index.html" class="back">← Volver al Ranking</a>
-</div>
+        <div class="input-group">
+            <label class="input-label" for="passLogin">Contraseña</label>
+            <input id="passLogin" type="password" placeholder="••••••••">
+        </div>
 
-<script>
-// CONFIGURACIÓN FIREBASE (Sincronizada con Admin)
-const firebaseConfig = {
-  apiKey: "AIzaSyD_eT9VlLk_b1toTcva8w9NwU-FGjrEtEI",
-  authDomain: "ranking-dbz-bt3.firebaseapp.com",
-  databaseURL: "https://ranking-dbz-bt3-default-rtdb.firebaseio.com",
-  projectId: "ranking-dbz-bt3",
-  storageBucket: "ranking-dbz-bt3.firebasestorage.app",
-  messagingSenderId: "228731370543",
-  appId: "1:228731370543:web:ff3e418be283b6387edada"
-};
-firebase.initializeApp(firebaseConfig);
-const db = firebase.database();
+        <button onclick="intentarLogin()">⚡ ENTRAR A LA ARENA</button>
 
-let players = [];
+        <div id="errorMessage" class="error">⚠ Usuario o contraseña incorrectos</div>
 
-// Escuchar cambios en la lista de jugadores de Firebase
-db.ref('players').on('value', snapshot => {
-    players = snapshot.val() || [];
-});
+        <div class="register-text">
+            ¿No tienes una cuenta?<br>
+            <a href="registro.html">Regístrate como Guerrero</a>
+        </div>
 
-function intentarLogin() {
-    const userVal = document.getElementById("userLogin").value.trim();
-    const passVal = document.getElementById("passLogin").value.trim();
-    const errorMsg = document.getElementById("errorMessage");
+        <a href="index.html" class="back">← Volver al Ranking</a>
+    </div>
 
-    if(!userVal || !passVal) return;
-
-    // Buscar en la base de datos descargada de Firebase
-    const encontrado = players.find(p => 
-        p.name.toLowerCase() === userVal.toLowerCase() && 
-        String(p.password) === String(passVal)
-    );
-
-    if (encontrado) {
-        // Guardar el nombre del usuario logueado para que el Index lo reconozca
-        localStorage.setItem("logged_user", encontrado.name);
-        window.location.href = "index.html";
-    } else {
-        errorMsg.style.display = "block";
-        setTimeout(() => { errorMsg.style.display = "none"; }, 3000);
-    }
-}
-</script>
+    <script src="js/login.js"></script>
 </body>
+
 </html>
