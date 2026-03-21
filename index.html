@@ -3,129 +3,723 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Ranking DBZ BT3 — Torneo Competitivo</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐉</text></svg>">
-    <meta name="description" content="Ranking competitivo de Dragon Ball Z Budokai Tenkaichi 3 con sistema ELO, historial de peleas y estadísticas en tiempo real.">
+    <title>Ranking DBZ BT3</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="google-adsense-account" content="ca-pub-1831930018468380">
-
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="css/common.css">
-    <link rel="stylesheet" href="css/index.css">
+<style>
+    :root {
+        --primary-gold: #FFD700;
+        --dark-gold: #DAA520;
+        --dark-bg: #0a0a0a;
+        --card-bg: rgba(20, 20, 20, 0.85);
+        --border-glow: rgba(255, 215, 0, 0.3);
+    }
 
-    <script src="utils/firebase-config.js"></script>
-    <script src="utils/constants.js"></script>
+    body {
+        font-family: 'Segoe UI', Arial, sans-serif;
+        background: url('Imagenes/goku wallp.jpg') no-repeat center center fixed;
+        background-size: cover;
+        color: #fff;
+        margin: 0;
+        padding: 20px 10px;
+        min-height: 100vh;
+        position: relative;
+    }
 
-    <!-- Google Analytics -->
+    body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background: linear-gradient(to bottom, rgba(0,0,0,0.7), rgba(0,0,0,0.9));
+        z-index: -1;
+    }
+
+    h1 {
+        text-align: center;
+        color: var(--primary-gold);
+        font-size: 2.8rem;
+        text-transform: uppercase;
+        letter-spacing: 4px;
+        text-shadow: 0 0 20px rgba(255,215,0,0.7), 0 0 40px rgba(255,215,0,0.4);
+        margin: 0 0 25px;
+    }
+
+    /* Contenedor principal con glow */
+    .table-container {
+        background: var(--card-bg);
+        border-radius: 16px;
+        border: 1px solid var(--border-glow);
+        box-shadow: 0 15px 40px rgba(0,0,0,0.6), inset 0 0 20px rgba(255,215,0,0.08);
+        max-width: 100%;
+        margin: 0 auto 30px;
+        position: relative;
+    }
+
+    /* En móvil y tablets: activar scroll horizontal + barra discreta */
+    @media (max-width: 1024px) {
+        .table-container {
+            overflow-x: auto;
+            overflow-y: hidden;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* Barra delgada en móvil */
+        .table-container::-webkit-scrollbar {
+            height: 6px;
+        }
+
+        .table-container::-webkit-scrollbar-track {
+            background: rgba(0,0,0,0.4);
+            border-radius: 10px;
+        }
+
+        .table-container::-webkit-scrollbar-thumb {
+            background: var(--primary-gold);
+            border-radius: 10px;
+        }
+    }
+
+    /* En PC grande: NO scroll horizontal */
+    @media (min-width: 1025px) {
+        .table-container {
+            overflow-x: hidden;
+        }
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 1rem;
+        min-width: 700px; /* Mantiene scroll en móvil */
+    }
+
+    @media (min-width: 1025px) {
+        table {
+            min-width: 100%; /* Se adapta en PC grande sin scroll */
+        }
+    }
+
+    th {
+        background: linear-gradient(145deg, #1a1a1a, #111);
+        color: var(--primary-gold);
+        text-transform: uppercase;
+        font-size: 0.85rem;
+        padding: 16px 10px;
+        border-bottom: 2px solid var(--dark-gold);
+        letter-spacing: 1px;
+    }
+
+    td {
+        padding: 14px 10px;
+        border-bottom: 1px solid rgba(255,255,255,0.05);
+        text-align: center;
+        transition: all 0.2s;
+    }
+
+    tr:hover td {
+        background: rgba(255,215,0,0.08);
+        transform: scale(1.01);
+    }
+
+    /* Destacar filas según posición global */
+    tr[data-position="1"] td {
+        background: linear-gradient(90deg, rgba(255,215,0,0.25), rgba(255,215,0,0.08));
+        border-left: 6px solid #FFD700;
+        box-shadow: inset 0 0 15px rgba(255,215,0,0.15);
+    }
+    tr[data-position="2"] td {
+        background: linear-gradient(90deg, rgba(218,165,32,0.18), rgba(218,165,32,0.06));
+        border-left: 5px solid #DAA520;
+    }
+    tr[data-position="3"] td {
+        background: linear-gradient(90deg, rgba(218,165,32,0.12), rgba(218,165,32,0.04));
+        border-left: 5px solid #DAA520;
+    }
+
+    tr[data-position="1"]:hover td,
+    tr[data-position="2"]:hover td,
+    tr[data-position="3"]:hover td {
+        background: linear-gradient(90deg, rgba(255,215,0,0.35), rgba(255,215,0,0.15)) !important;
+    }
+
+    /* Columna # con medallas */
+    td:first-child {
+        font-weight: bold;
+        color: var(--primary-gold);
+        position: relative;
+        padding-left: 35px !important;
+    }
+
+    tr[data-position="1"] td:first-child::before { content: "👑"; font-size: 1.4rem; position: absolute; left: 8px; top: 50%; transform: translateY(-50%); }
+    tr[data-position="2"] td:first-child::before { content: "🥈"; font-size: 1.3rem; position: absolute; left: 10px; top: 50%; transform: translateY(-50%); }
+    tr[data-position="3"] td:first-child::before { content: "🥉"; font-size: 1.3rem; position: absolute; left: 10px; top: 50%; transform: translateY(-50%); }
+
+    /* Guerrero */
+    td:nth-child(3) {
+        text-align: left;
+        font-weight: bold;
+        padding-left: 20px !important;
+    }
+
+    .player-link {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        color: #fff;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .player-link:hover {
+        color: var(--primary-gold);
+        transform: translateX(3px); /* Movimiento mínimo para evitar salto */
+    }
+
+    .player-flag {
+        width: 28px;
+        height: 20px;
+        border-radius: 4px;
+        border: 1px solid rgba(255,215,0,0.3);
+    }
+
+    .status-dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        margin-left: auto;
+        flex-shrink: 0;
+    }
+
+    .status-online { background: #4CAF50; animation: pulse 2s infinite; }
+
+    @keyframes pulse {
+        0% { box-shadow: 0 0 0 0 rgba(76,175,80,0.7); }
+        70% { box-shadow: 0 0 0 10px rgba(76,175,80,0); }
+        100% { box-shadow: 0 0 0 0 rgba(76,175,80,0); }
+    }
+
+    /* Rangos con glow */
+    .rank-S { color: #FFD700; text-shadow: 0 0 10px gold; font-weight: bold; }
+    .rank-A { color: #FF5252; font-weight: bold; }
+    .rank-B { color: #4CAF50; font-weight: bold; }
+    .rank-C { color: #03A9F4; font-weight: bold; }
+    .rank-D { color: #BDBDBD; font-weight: bold; }
+    .rank-E { color: #9E9E9E; font-weight: bold; }
+
+    /* Progreso con glow */
+    .progress {
+        background: rgba(0,0,0,0.5);
+        height: 8px;
+        border-radius: 4px;
+        overflow: hidden;
+        box-shadow: inset 0 1px 3px rgba(0,0,0,0.6);
+    }
+
+    .progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #FFD700, #FFEA00);
+        box-shadow: 0 0 10px rgba(255,215,0,0.7);
+        transition: width 0.6s ease;
+    }
+
+    /* Contadores online/offline */
+    .online-offline-container {
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+        margin: 25px 0;
+        flex-wrap: wrap;
+    }
+
+    .online-offline-box {
+        background: rgba(0,0,0,0.6);
+        padding: 12px 24px;
+        border-radius: 12px;
+        font-size: 1.3rem;
+        font-weight: bold;
+        border: 1px solid;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+        min-width: 220px;
+        text-align: center;
+    }
+
+    .online-box { border-color: #4CAF50; color: #4CAF50; }
+    .offline-box { border-color: #9E9E9E; color: #9E9E9E; }
+
+    /* Buscador épico */
+    #searchRanking {
+        width: 100%;
+        max-width: 500px;
+        margin: 0 auto 25px;
+        display: block;
+        padding: 14px 20px;
+        border-radius: 30px;
+        border: 2px solid #444;
+        background: rgba(20,20,20,0.7);
+        color: white;
+        font-size: 1.1rem;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.4);
+    }
+
+    #searchRanking:focus {
+        border-color: var(--primary-gold);
+        box-shadow: 0 0 15px rgba(255,215,0,0.4);
+        outline: none;
+    }
+
+    /* Modal */
+    .modal {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, .85);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+    }
+
+    .hidden {
+        display: none !important;
+    }
+
+    .modal-content {
+        background: linear-gradient(145deg, #1e1e1e, #111);
+        border: 2px solid var(--primary-gold);
+        box-shadow: 0 0 30px rgba(255,215,0,0.3);
+        border-radius: 16px;
+        padding: 25px;
+        max-width: 90%;
+        width: 600px;
+    }
+
+    /* Responsividad */
+    @media (max-width: 768px) {
+        h1 { font-size: 2.2rem; }
+        .table-container { padding: 0; }
+        th, td { padding: 10px 6px; font-size: 0.85rem; }
+    }
+
+    /* Paginación grande y cómoda */
+    .pagination {
+        text-align: center;
+        margin: 25px 0;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 10px;
+        padding: 10px 0;
+    }
+
+    .pagination button {
+        min-width: 48px;
+        height: 48px;
+        padding: 0 16px;
+        border-radius: 10px;
+        border: 2px solid var(--primary-gold);
+        background: rgba(17,17,17,0.9);
+        color: var(--primary-gold);
+        font-weight: bold;
+        font-size: 1.1rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .pagination button:hover {
+        background: var(--primary-gold);
+        color: #000;
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(255,215,0,0.4);
+    }
+
+    .pagination button.active {
+        background: var(--primary-gold);
+        color: #000;
+        border-color: #fff;
+        box-shadow: 0 0 20px rgba(255,215,0,0.6);
+        transform: scale(1.1);
+    }
+
+    @media (max-width: 600px) {
+        .pagination button {
+            min-width: 52px;
+            height: 52px;
+            font-size: 1.2rem;
+            padding: 0 18px;
+        }
+    }
+</style>
+    <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-5C5SDM9QZG"></script>
     <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-        gtag('config', 'G-5C5SDM9QZG');
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-5C5SDM9QZG');
     </script>
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1831930018468380" crossorigin="anonymous"></script>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1831930018468380"
+     crossorigin="anonymous"></script>
 </head>
 
 <body>
-    <div>hola</div>
-    <div class="page-wrapper">
 
-        <!-- User Session Bar -->
-        <div id="user-identity-container">
-            <div id="user-bar" class="user-bar-style" style="display:none;">
-                <span style="color: var(--text-muted); font-size: 0.85rem;">👤 Guerrero: <strong id="current-user-name" style="color: var(--gold);"></strong></span>
-                <button onclick="cerrarSesion()" class="btn-exit">Salir</button>
-            </div>
-            <div id="login-prompt" class="login-prompt-style">
-                <p style="color: var(--text-muted); margin-bottom: 16px; font-size: 0.85rem;">Inicia sesión para registrar tus victorias y entrar a las salas:</p>
-                <a href="login.html" style="text-decoration: none;">
-                    <button class="btn-login">🔑 INGRESAR AL RANKING</button>
-                </a>
-            </div>
-        </div>
-
-        <!-- Hero Section -->
-        <div class="hero-section">
-            <span class="hero-eyebrow">⚡ Temporada Activa</span>
-            <h1>Ranking DBZ BT3</h1>
-            <p class="hero-subtitle">Sistema ELO · Batallas en Tiempo Real</p>
-        </div>
-
-        <!-- Ads -->
-        <div class="ads-container">
-            <script>
-                atOptions = {
-                    'key': 'ea7c460a95baaa7dc4a2bc45b7502fb2',
-                    'format': 'iframe',
-                    'height': 90,
-                    'width': 728,
-                    'params': {}
-                };
-            </script>
-            <script src="https://www.highperformanceformat.com/ea7c460a95baaa7dc4a2bc45b7502fb2/invoke.js"></script>
-        </div>
-
-        <!-- Search -->
-        <div class="search-container">
-            <span class="search-icon">🔍</span>
-            <input id="searchRanking" placeholder="Buscar guerrero...">
-        </div>
-
-        <!-- Status Command Center -->
-        <div class="online-offline-container">
-            <div class="online-offline-box online-box">
-                <div class="indicator"></div>
-                <span>En línea: <strong id="onlineCount">0</strong></span>
-            </div>
-            <div class="online-offline-box offline-box">
-                <div class="indicator"></div>
-                <span>Desconectados: <strong id="offlineCount">0</strong></span>
+    <div id="user-identity-container" style="max-width: 800px; margin: 10px auto; text-align: center;">
+        <div id="user-bar"
+            style="background: rgba(26,26,26,0.9); padding: 15px; border-radius: 10px; display: none; justify-content: space-between; align-items: center; border: 1px solid #FFD700;">
+            <span style="color: white;">👤 Guerrero: <strong id="current-user-name"
+                    style="color: #FFD700;"></strong></span>
+            <div>
+                <!-- 
+                <button onclick="window.location.href='sala.html'"
+                    style="background: #FFD700; color: black; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-weight: bold; margin-right: 10px;">⚔️
+                    Arena</button>-->
+                <button onclick="cerrarSesion()"
+                    style="background: #ff4444; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-weight: bold;">Salir</button>
             </div>
         </div>
 
-        <!-- Ranking Table -->
-        <div class="table-container">
-            <table>
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>País</th>
-                        <th style="text-align:left; padding-left: 14px;">Guerrero</th>
-                        <th>Rango</th>
-                        <th>ELO</th>
-                        <th>Progreso</th>
-                        <th>W/L</th>
-                        <th>Racha</th>
-                    </tr>
-                </thead>
-                <tbody id="ranking"></tbody>
-            </table>
+        <div id="login-prompt"
+            style="background: rgba(26,26,26,0.9); padding: 20px; border-radius: 10px; border: 1px solid #444; display: none;">
+            <p style="color: #aaa; margin-bottom: 15px;">Inicia sesión para registrar tus victorias y entrar a las
+                salas:</p>
+            <a href="login.html" style="text-decoration: none;">
+                <button
+                    style="background: #03a9f4; color: #000; border: none; padding: 12px 25px; border-radius: 8px; cursor: pointer; font-weight: bold;">
+                    🔑 INGRESAR AL RANKING
+                </button>
+            </a>
         </div>
+    </div>
 
-        <!-- Pagination -->
-        <div class="pagination" id="pagination"></div>
+    <h1>🔥 RANKING DBZ BT3 🔥</h1>
+    <div style="text-align: center; margin: 20px 0; max-width: 100%; overflow: hidden;">
 
-    </div><!-- /page-wrapper -->
+        <script>
+              atOptions = {
+                'key' : 'ea7c460a95baaa7dc4a2bc45b7502fb2',
+                'format' : 'iframe',
+                'height' : 90,
+                'width' : 728,
+                'params' : {}
+              };
+        </script>
+        <script src="https://www.highperformanceformat.com/ea7c460a95baaa7dc4a2bc45b7502fb2/invoke.js"></script>
+    </div>
 
-    <!-- Player Modal -->
+    <div style="text-align: center; margin: 20px 0;">
+      <input 
+        id="searchRanking" 
+        placeholder="🔍 Buscar guerrero..." 
+        style="width: 100%; max-width: 400px; padding: 12px 16px; border-radius: 12px; border: 1px solid #444; background: #111; color: white; font-size: 1rem; box-sizing: border-box;"
+      >
+    </div>
+
+    <div class="online-offline-container">
+      <div class="online-offline-box online-box">
+        Jugadores en línea: <strong id="onlineCount">0</strong> 🟢
+      </div>
+      
+      <div class="online-offline-box offline-box">
+        Jugadores desconectados: <strong id="offlineCount">0</strong> ⚪
+      </div>
+    </div>
+
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>🌐</th>
+                    <th>Guerrero</th>
+                    <th>Rango</th>
+                    <th>ELO</th>
+                    <th>Progreso</th>
+                    <th>W/L</th>
+                    <th>Racha</th>
+                </tr>
+            </thead>
+            <tbody id="ranking"></tbody>
+        </table>
+    </div>
+
+    <div class="pagination" id="pagination"></div>
+
     <div id="modal" class="modal hidden">
         <div class="modal-content">
-            <h3 id="modalTitle" class="modal-main-title"></h3>
-            <div id="modalStats" class="modal-stats-container"></div>
-            <h4 class="history-title">Últimas Peleas</h4>
-            <ul id="modalHistory" class="modal-history-list"></ul>
-            <div id="modalActionContainer"></div>
-            <button onclick="closeModal()" class="btn-close-modal">✕ CERRAR</button>
+            <h3 id="modalTitle" style="text-align:center; margin-top:0;"></h3>
+            <div id="modalStats" style="background: #2a2a2a; padding: 15px; border-radius: 10px; margin: 10px 0;"></div>
+            <canvas id="eloChart" width="400" height="200"></canvas>
+            <h4 style="margin: 15px 0 5px 0; font-size: 0.9rem; color: #FFD700;">Últimas Peleas:</h4>
+            <ul id="modalHistory" style="list-style: none; padding: 0; margin-bottom: 20px;"></ul>
+            <button onclick="closeModal()"
+                style="width:100%; padding:12px; cursor:pointer; background: #444; color: white; border: none; border-radius: 8px; font-weight: bold;">Cerrar</button>
         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="js/index.js"></script>
+    <script>
+        // --- CONFIGURACIÓN FIREBASE ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyD_eT9VlLk_b1toTcva8w9NwU-FGjrEtEI",
+            authDomain: "ranking-dbz-bt3.firebaseapp.com",
+            databaseURL: "https://ranking-dbz-bt3-default-rtdb.firebaseio.com",
+            projectId: "ranking-dbz-bt3",
+            storageBucket: "ranking-dbz-bt3.firebasestorage.app",
+            messagingSenderId: "228731370543",
+            appId: "1:228731370543:web:ff3e418be283b6387edada"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+        let alreadyMarkedOnline = {}; // objeto para marcar por usuario (evita repetir)
+
+        let players = [], history = [];
+        const PAGE_SIZE = 10;
+        let currentPage = 1;
+        let chartInstance = null;
+
+        const ranks = [
+            { name: "E", min: 0, max: 699, class: "rank-E" },
+            { name: "D", min: 700, max: 999, class: "rank-D" },
+            { name: "C", min: 1000, max: 1299, class: "rank-C" },
+            { name: "B", min: 1300, max: 1599, class: "rank-B" },
+            { name: "A", min: 1600, max: 1899, class: "rank-A" },
+            { name: "S", min: 1900, max: Infinity, class: "rank-S" }
+        ];
+
+        function getBanderaHTML(country) {
+            if (!country) return "🏳️";
+            const banderas = { "ARGENTINA": "bandera argentina.png",
+              "PERÚ": "bandera peru.png",
+              "PARAGUAY": "bandera paraguay.png",
+              "CHILE": "bandera chile.png",
+              "URUGUAY": "bandera uruguay.png",
+              "BRASIL": "bandera brasil.png",
+              "VENEZUELA": "bandera venezuela.png"     // clave exacta
+            };
+
+            const file = banderas[country.toUpperCase()];
+            return file ? `<img src="Imagenes/${file}" class="player-flag">` : "🏳️";
+        }
+
+        function getRank(e) { return ranks.find(r => e >= r.min && e <= r.max) || ranks[0]; }
+        function getProgress(e, r) { return r.name === "S" ? 100 : Math.max(5, Math.min(100, ((e - r.min) / (r.max - r.min)) * 100)); }
+
+        db.ref('/').on('value', snapshot => {
+            const data = snapshot.val();
+            players = data?.players || [];
+            history = data?.history || [];
+            // Ordenar history descendente por id (nuevos primero) - FIX: parseInt para ids strings
+            history.sort((a, b) => {
+                const timeA = a.timestamp || parseInt(a.id) || 0;
+                const timeB = b.timestamp || parseInt(b.id) || 0;
+                return timeB - timeA; // descendente: nuevos primero
+            });
+            render();
+            verificarSesion();
+        
+            // Listener para status online/offline + contadores (Paso 6)
+            db.ref('status').on('value', snapshotStatus => {
+                const statusData = snapshotStatus.val() || {};
+        
+                // Actualiza puntos en la tabla
+                document.querySelectorAll('[id^="status-"]').forEach(span => {
+                  const rawId = span.id.replace('status-', '');
+                  const playerName = rawId.replace(/_/g, '-');
+                
+                  const userStatus = statusData[playerName];
+                  span.className = ''; // limpia clases previas
+                  span.innerHTML = ''; // limpia contenido anterior
+                
+                  if (userStatus && userStatus.online === true) {
+                    span.classList.add('status-online');
+                  } else {
+                    span.innerHTML = '⚪';
+                    span.style.color = '#9E9E9E';
+                    span.style.fontSize = '1.1em';
+                  }
+                });
+        
+                // Contador de jugadores online
+                const onlinePlayers = Object.values(statusData).filter(s => s.online === true).length;
+                document.getElementById('onlineCount').innerText = onlinePlayers;
+        
+                // Contador desconectados: TODOS los jugadores de /players - online
+                db.ref('players').once('value').then(playersSnapshot => {
+                    const allPlayers = playersSnapshot.val() || {};
+                    const totalPlayers = Object.keys(allPlayers).length;
+                    const disconnectedPlayers = totalPlayers - onlinePlayers;
+                    document.getElementById('offlineCount').innerText = disconnectedPlayers;
+                });
+            });
+        });
+
+        function render() {
+            const rankingEl = document.getElementById('ranking');
+            const busqueda = document.getElementById('searchRanking').value.toLowerCase();
+            // Ordenar por ELO
+            let ordenados = [...players].sort((a, b) => b.elo - a.elo);
+            // Filtrar
+            let filtrados = ordenados.filter(p => p.name.toLowerCase().includes(busqueda));
+            // Paginación
+            const start = (currentPage - 1) * PAGE_SIZE;
+            const visibles = filtrados.slice(start, start + PAGE_SIZE);
+            rankingEl.innerHTML = visibles.map((p) => {
+                const r = getRank(p.elo);
+                const pos = ordenados.findIndex(x => x.name === p.name) + 1;
+                const rachaClass = p.streak > 0 ? 'color:#4caf50' : 'color:#ff5252';
+                const rachaIcon = p.streak > 0 ? '🔥' : (p.streak < 0 ? '💀' : '');
+        
+                return `<tr data-position="${pos}">  <!-- ← ESTA ES LA LÍNEA QUE FALTABA -->
+                    <td style="font-weight:bold; color:#aaa;">${pos}</td>
+                    <td style="padding-right: 4px !important; text-align: right;">${getBanderaHTML(p.country)}</td>
+                    <td style="padding-left: 4px !important; text-align: left;">
+                        <span class="player-link" onclick="openModal('${p.name}')">
+                            <span class="player-name-text">${p.name}</span>
+                            <span id="status-${p.name.replace(/[^a-zA-Z0-9]/g, '_')}" class="status-dot"></span>
+                        </span>
+                    </td>
+                    <td class="${r.class}">${r.name}</td>
+                    <td style="font-weight:bold;">${Math.round(p.elo)}</td>
+                    <td><div class="progress"><div class="progress-fill" style="width:${getProgress(p.elo, r)}%"></div></div></td>
+                    <td>${p.wins}/${p.losses}</td>
+                    <td style="${rachaClass}; font-weight:bold;">${rachaIcon} ${Math.abs(p.streak || 0)}</td>
+                </tr>`;
+            }).join("");
+            renderPagination(filtrados.length);
+        }
+
+        function renderPagination(totalItems) {
+            const totalPages = Math.ceil(totalItems / PAGE_SIZE);
+            const container = document.getElementById('pagination');
+            container.innerHTML = "";
+            if (totalPages <= 1) return;
+
+            for (let i = 1; i <= totalPages; i++) {
+                const btn = document.createElement("button");
+                btn.innerText = i;
+                if (i === currentPage) btn.className = "active";
+                btn.onclick = () => { currentPage = i; render(); };
+                container.appendChild(btn);
+            }
+        }
+
+        // --- LÓGICA DE SESIÓN ---
+        function verificarSesion() {
+          const nombre = localStorage.getItem("logged_user");
+          const userBar = document.getElementById("user-bar");
+          const loginPrompt = document.getElementById("login-prompt");
+          const nameDisplay = document.getElementById("current-user-name");
+        
+          if (nombre) {
+            userBar.style.display = "flex";
+            loginPrompt.style.display = "none";
+            nameDisplay.innerText = nombre;
+        
+            // Marca online SOLO una vez por sesión
+            if (!alreadyMarkedOnline[nombre]) {
+              alreadyMarkedOnline[nombre] = true;
+        
+              const statusRef = db.ref('status/' + nombre);
+        
+              statusRef.set({
+                online: true,
+                lastActive: firebase.database.ServerValue.TIMESTAMP,
+                device: navigator.userAgent
+              }).then(() => {
+                console.log(nombre + " marcado como ONLINE (solo una vez)");
+              }).catch(err => console.error("Error al marcar online:", err));
+        
+              statusRef.onDisconnect().set({
+                online: false,
+                lastActive: firebase.database.ServerValue.TIMESTAMP
+              }).then(() => {
+                console.log("onDisconnect configurado para " + nombre);
+              }).catch(err => console.error("Error en onDisconnect:", err));
+            }
+          } else {
+            userBar.style.display = "none";
+            loginPrompt.style.display = "block";
+          }
+        }
+        function cerrarSesion() {
+            if (confirm("¿Cerrar sesión de guerrero?")) {
+                localStorage.removeItem("logged_user");
+                location.reload();
+            }
+        }
+
+        // --- MODAL Y GRÁFICO ---
+
+        function openModal(name) {
+            const p = players.find(x => x.name === name);
+            if (!p) return;
+        
+            // Título del modal
+            document.getElementById('modalTitle').innerHTML = `${getBanderaHTML(p.country)} ${p.name}`;
+        
+            // Estadísticas básicas
+            document.getElementById('modalStats').innerHTML = `
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 10px; text-align:left;">
+                    <div><b>Rango:</b> <span class="${getRank(p.elo).class}">${getRank(p.elo).name}</span></div>
+                    <div><b>ELO:</b> ${Math.round(p.elo)}</div>
+                    <div><b>Victorias:</b> ${p.wins}</div>
+                    <div><b>Derrotas:</b> ${p.losses}</div>
+                </div>
+                <button onclick="window.location.href='perfil.html?player=${encodeURIComponent(name)}'"
+                        style="width:100%; margin-top:15px; padding:8px; background:#FFD700; border:none; border-radius:5px; font-weight:bold; cursor:pointer;">
+                        VER PERFIL COMPLETO
+                </button>
+            `;
+        
+            // Últimas 5 peleas (sin invertir, ya que history está ordenada descendente)
+            const ultimasPeleas = history.filter(h => h.p1 === name || h.p2 === name).slice(0, 5);
+            document.getElementById('modalHistory').innerHTML = ultimasPeleas.map(h => {
+                const gano = (h.p1 === name && h.s1 > h.s2) || (h.p2 === name && h.s2 > h.s1);
+                return `<li style="padding:5px 0; border-bottom:1px solid #333; font-size:0.85rem;">
+                    <span style="color:${gano ? '#4caf50' : '#ff5252'}">${gano ? 'WIN' : 'LOSS'}</span> | 
+                    ${h.p1} ${h.s1} - ${h.s2} ${h.p2}
+                </li>`;
+            }).join("");
+        
+            // Mostrar el modal (quita hidden)
+            document.getElementById('modal').classList.remove("hidden");
+        
+            // Opcional: si querés cargar un gráfico simple aquí (puede ser pesado, así que lo dejamos comentado por ahora)
+            // renderMiniChart(name); // si tenés una función para gráfico pequeño
+        }
+
+        function closeModal() { document.getElementById('modal').classList.add("hidden"); }
+
+        document.getElementById('searchRanking').addEventListener('input', () => {
+            currentPage = 1;
+            render();
+        });
+    </script>
 </body>
 
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
