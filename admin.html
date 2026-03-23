@@ -576,6 +576,7 @@
       <option value="CHILE">Chile 🇨🇱</option>
       <option value="URUGUAY">Uruguay 🇺🇾</option>
       <option value="BRASIL">Brasil 🇧🇷</option> <!-- NUEVA LÍNEA -->
+      <option value="ECUADOR">Ecuador 🇪🇨</option>   <!-- ← NUEVA LÍNEA -->
     </select>
     <button onclick="addPlayer()">Agregar Guerrero</button>
     <button onclick="forceRebuild()" style="background:#4CAF50; color:white; margin-top:10px;">🔄 Sincronizar y
@@ -702,7 +703,9 @@
         "PERÚ": "bandera peru.png",
         "PARAGUAY": "bandera paraguay.png",
         "CHILE": "bandera chile.png",
-        "URUGUAY": "bandera uruguay.png"
+        "URUGUAY": "bandera uruguay.png",
+        "ECUADOR": "bandera ecuador.png",   // ← AGREGAR ESTA LÍNEA
+        "VENEZUELA": "bandera venezuela.png"     // clave exacta
       };
       return banderas[country.toUpperCase()] ? `<img src="Imagenes/${banderas[country.toUpperCase()]}" class="player-flag">` : "";
     }
