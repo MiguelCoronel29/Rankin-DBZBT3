@@ -30,265 +30,6 @@
 
   <style>
     body {
-        font-family: Arial, sans-serif;
-        background: #0d0d0d;
-        color: #fff;
-        padding: 10px;
-        margin: 0;
-    }
-
-    h1, h2 {
-        text-align: center;
-        margin: 10px 0;
-    }
-
-    section {
-        background: #1a1a1a;
-        padding: 12px;
-        margin-bottom: 10px;
-        border-radius: 12px;
-    }
-
-    input, button, select {
-        width: 100%;
-        padding: 10px;
-        margin: 5px 0;
-        border-radius: 8px;
-        border: none;
-        font-size: 1rem;
-        box-sizing: border-box;
-    }
-
-    button {
-        background: #03a9f4;
-        color: #000;
-        cursor: pointer;
-        font-weight: bold;
-    }
-
-    button:hover {
-        opacity: 0.85;
-    }
-
-    select {
-        background: #333;
-        color: #fff;
-        cursor: pointer;
-    }
-
-    table {
-        width: 100%;
-        border-collapse: collapse;
-        font-size: 0.85rem;
-    }
-
-    th, td {
-        padding: 12px 5px;
-        border-bottom: 1px solid #333;
-        text-align: center;
-    }
-
-    th {
-        background: #222;
-        color: #bbb;
-        font-size: 0.75rem;
-        text-transform: uppercase;
-    }
-
-    .rank-col {
-        color: #FFD700;
-        font-weight: bold;
-        width: 30px;
-    }
-
-    .player-name-col {
-        text-align: left;
-        padding-left: 10px;
-        font-weight: bold;
-    }
-
-    .rank-S { color: #FFD700; font-weight: bold; }
-    .rank-A { color: #FF5252; font-weight: bold; }
-    .rank-B { color: #4CAF50; font-weight: bold; }
-    .rank-C { color: #03A9F4; font-weight: bold; }
-    .rank-D { color: #BDBDBD; font-weight: bold; }
-    .rank-E { color: #9E9E9E; font-weight: bold; }
-
-    .player-flag {
-        width: 22px;
-        height: 15px;
-        object-fit: cover;
-        display: block;
-        margin: auto;
-        border-radius: 2px;
-    }
-
-    .del-btn, .edit-btn {
-        background: transparent;
-        border: none;
-        cursor: pointer;
-        opacity: 0.5;
-        width: auto;
-        display: inline-block;
-    }
-
-    .del-btn:hover, .edit-btn:hover {
-        opacity: 1;
-    }
-
-    .log-container {
-        display: flex;
-        flex-direction: column;
-        gap: 4px;
-    }
-
-    .log {
-        background: #111;
-        padding: 10px 12px;
-        border-radius: 6px;
-        font-size: 0.85rem;
-        display: flex;
-        align-items: center;
-    }
-
-    .log-num {
-        color: #FFD700;
-        font-weight: bold;
-        width: 35px;
-    }
-
-    .log-content {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        flex: 1;
-    }
-
-    .log-score {
-        width: 60px;
-        text-align: center;
-        color: #aaa;
-        font-weight: bold;
-    }
-
-    .win { color: #4CAF50; font-weight: bold; }
-    .loss { color: #F44336; font-weight: bold; }
-
-    /* Paginación limpia y responsiva */
-    .pagination {
-        text-align: center;
-        margin: 20px 0;
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
-        align-items: center;
-        gap: 8px;
-        max-width: 100%;
-        padding: 0 10px;
-        box-sizing: border-box;
-    }
-
-    .pagination button {
-        min-width: 36px;
-        height: 36px;
-        padding: 0 10px;
-        border-radius: 6px;
-        border: 1px solid #FFD700;
-        background: #111;
-        color: #FFD700;
-        font-weight: bold;
-        cursor: pointer;
-        transition: all 0.2s;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .pagination button.active {
-        background: #FFD700;
-        color: #111;
-    }
-
-    .pagination button:disabled {
-        opacity: 0.4;
-        cursor: not-allowed;
-        background: #222;
-    }
-
-    .pagination span {
-        padding: 0 8px;
-        color: #FFD700;
-        font-size: 1.1rem;
-        align-self: center;
-    }
-
-    @media (max-width: 600px) {
-        .pagination {
-            gap: 6px;
-            padding: 0 5px;
-        }
-        .pagination button {
-            min-width: 32px;
-            height: 32px;
-            padding: 0 8px;
-            font-size: 0.9rem;
-        }
-        .pagination span {
-            padding: 0 6px;
-            font-size: 1rem;
-        }
-    }
-
-    .modal {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.8);
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        z-index: 100;
-    }
-
-    .hidden {
-        display: none;
-    }
-
-    .modal-content {
-        background: #222;
-        padding: 20px;
-        border-radius: 12px;
-        width: 80%;
-        max-width: 300px;
-    }
-</style>
-<head>
-  <meta charset="UTF-8">
-  <title>Admin Ranking DBZ BT3</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-
-  <script>
-    // --- PROTECCIÓN DE ACCESO AL PANEL ---
-    (function () {
-      const claveCorrecta = "Vicky321tyler";
-      const sesion = sessionStorage.getItem("admin_auth");
-
-      if (sesion !== "true") {
-        const password = prompt("Seguridad: Ingrese la clave de administrador para acceder al panel:");
-        if (password === claveCorrecta) {
-          sessionStorage.setItem("admin_auth", "true");
-        } else {
-          alert("Acceso denegado.");
-          window.location.href = 'index.html';
-        }
-      }
-    })();
-  </script>
-
-  <style>
-    body {
       font-family: Arial, sans-serif;
       background: #0d0d0d;
       color: #fff;
@@ -329,7 +70,7 @@
     }
 
     button:hover {
-      opacity: .85
+      opacity: 0.85;
     }
 
     select {
@@ -461,35 +202,79 @@
 
     .win {
       color: #4CAF50;
-      font-weight: bold
+      font-weight: bold;
     }
 
     .loss {
       color: #F44336;
-      font-weight: bold
+      font-weight: bold;
     }
 
+    /* Paginación limpia y responsiva */
     .pagination {
       text-align: center;
-      margin-top: 10px;
+      margin: 20px 0;
       display: flex;
+      flex-wrap: wrap;
       justify-content: center;
+      align-items: center;
       gap: 8px;
+      max-width: 100%;
+      padding: 0 10px;
+      box-sizing: border-box;
     }
 
     .pagination button {
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      border: 2px solid #FFD700;
+      min-width: 36px;
+      height: 36px;
+      padding: 0 10px;
+      border-radius: 6px;
+      border: 1px solid #FFD700;
       background: #111;
       color: #FFD700;
+      font-weight: bold;
       cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
     .pagination button.active {
       background: #FFD700;
       color: #111;
+    }
+
+    .pagination button:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+      background: #222;
+    }
+
+    .pagination span {
+      padding: 0 8px;
+      color: #FFD700;
+      font-size: 1.1rem;
+      align-self: center;
+    }
+
+    @media (max-width: 600px) {
+      .pagination {
+        gap: 6px;
+        padding: 0 5px;
+      }
+
+      .pagination button {
+        min-width: 32px;
+        height: 32px;
+        padding: 0 8px;
+        font-size: 0.9rem;
+      }
+
+      .pagination span {
+        padding: 0 6px;
+        font-size: 1rem;
+      }
     }
 
     .modal {
@@ -516,19 +301,275 @@
       width: 80%;
       max-width: 300px;
     }
+  </style>
 
-    .pagination {
-    text-align: center;
-    margin-top: 15px;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 6px; /* más chico en móvil */
-    max-width: 100%;
-    overflow-x: auto; /* scroll horizontal si se pasa en móvil muy pequeño */
-    }
-    
-    .pagination button {
+  <head>
+    <meta charset="UTF-8">
+    <title>Admin Ranking DBZ BT3</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <script>
+      // --- PROTECCIÓN DE ACCESO AL PANEL ---
+      (function () {
+        const claveCorrecta = "Vicky321tyler";
+        const sesion = sessionStorage.getItem("admin_auth");
+
+        if (sesion !== "true") {
+          const password = prompt("Seguridad: Ingrese la clave de administrador para acceder al panel:");
+          if (password === claveCorrecta) {
+            sessionStorage.setItem("admin_auth", "true");
+          } else {
+            alert("Acceso denegado.");
+            window.location.href = 'index.html';
+          }
+        }
+      })();
+    </script>
+
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background: #0d0d0d;
+        color: #fff;
+        padding: 10px;
+        margin: 0;
+      }
+
+      h1,
+      h2 {
+        text-align: center;
+        margin: 10px 0;
+      }
+
+      section {
+        background: #1a1a1a;
+        padding: 12px;
+        margin-bottom: 10px;
+        border-radius: 12px;
+      }
+
+      input,
+      button,
+      select {
+        width: 100%;
+        padding: 10px;
+        margin: 5px 0;
+        border-radius: 8px;
+        border: none;
+        font-size: 1rem;
+        box-sizing: border-box;
+      }
+
+      button {
+        background: #03a9f4;
+        color: #000;
+        cursor: pointer;
+        font-weight: bold;
+      }
+
+      button:hover {
+        opacity: .85
+      }
+
+      select {
+        background: #333;
+        color: #fff;
+        cursor: pointer;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.85rem;
+      }
+
+      th,
+      td {
+        padding: 12px 5px;
+        border-bottom: 1px solid #333;
+        text-align: center;
+      }
+
+      th {
+        background: #222;
+        color: #bbb;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+      }
+
+      .rank-col {
+        color: #FFD700;
+        font-weight: bold;
+        width: 30px;
+      }
+
+      .player-name-col {
+        text-align: left;
+        padding-left: 10px;
+        font-weight: bold;
+      }
+
+      .rank-S {
+        color: #FFD700;
+        font-weight: bold;
+      }
+
+      .rank-A {
+        color: #FF5252;
+        font-weight: bold;
+      }
+
+      .rank-B {
+        color: #4CAF50;
+        font-weight: bold;
+      }
+
+      .rank-C {
+        color: #03A9F4;
+        font-weight: bold;
+      }
+
+      .rank-D {
+        color: #BDBDBD;
+        font-weight: bold;
+      }
+
+      .rank-E {
+        color: #9E9E9E;
+        font-weight: bold;
+      }
+
+      .player-flag {
+        width: 22px;
+        height: 15px;
+        object-fit: cover;
+        display: block;
+        margin: auto;
+        border-radius: 2px;
+      }
+
+      .del-btn,
+      .edit-btn {
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        opacity: 0.5;
+        width: auto;
+        display: inline-block;
+      }
+
+      .del-btn:hover,
+      .edit-btn:hover {
+        opacity: 1;
+      }
+
+      .log-container {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+
+      .log {
+        background: #111;
+        padding: 10px 12px;
+        border-radius: 6px;
+        font-size: 0.85rem;
+        display: flex;
+        align-items: center;
+      }
+
+      .log-num {
+        color: #FFD700;
+        font-weight: bold;
+        width: 35px;
+      }
+
+      .log-content {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex: 1;
+      }
+
+      .log-score {
+        width: 60px;
+        text-align: center;
+        color: #aaa;
+        font-weight: bold;
+      }
+
+      .win {
+        color: #4CAF50;
+        font-weight: bold
+      }
+
+      .loss {
+        color: #F44336;
+        font-weight: bold
+      }
+
+      .pagination {
+        text-align: center;
+        margin-top: 10px;
+        display: flex;
+        justify-content: center;
+        gap: 8px;
+      }
+
+      .pagination button {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        border: 2px solid #FFD700;
+        background: #111;
+        color: #FFD700;
+        cursor: pointer;
+      }
+
+      .pagination button.active {
+        background: #FFD700;
+        color: #111;
+      }
+
+      .modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.8);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 100;
+      }
+
+      .hidden {
+        display: none;
+      }
+
+      .modal-content {
+        background: #222;
+        padding: 20px;
+        border-radius: 12px;
+        width: 80%;
+        max-width: 300px;
+      }
+
+      .pagination {
+        text-align: center;
+        margin-top: 15px;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 6px;
+        /* más chico en móvil */
+        max-width: 100%;
+        overflow-x: auto;
+        /* scroll horizontal si se pasa en móvil muy pequeño */
+      }
+
+      .pagination button {
         padding: 8px 12px;
         min-width: 40px;
         border-radius: 5px;
@@ -538,27 +579,27 @@
         font-weight: bold;
         cursor: pointer;
         transition: all 0.2s;
-    }
-    
-    .pagination button:disabled {
+      }
+
+      .pagination button:disabled {
         opacity: 0.5;
         cursor: not-allowed;
-    }
-    
-    @media (max-width: 480px) {
+      }
+
+      @media (max-width: 480px) {
         .pagination button {
-            padding: 6px 10px;
-            font-size: 0.9rem;
-            min-width: 36px;
+          padding: 6px 10px;
+          font-size: 0.9rem;
+          min-width: 36px;
         }
+
         .pagination span {
-            padding: 6px 8px;
-            font-size: 0.9rem;
+          padding: 6px 8px;
+          font-size: 0.9rem;
         }
-    }
-    
-  </style>
-</head>
+      }
+    </style>
+  </head>
 
 <body>
 
@@ -576,11 +617,15 @@
       <option value="CHILE">Chile 🇨🇱</option>
       <option value="URUGUAY">Uruguay 🇺🇾</option>
       <option value="BRASIL">Brasil 🇧🇷</option> <!-- NUEVA LÍNEA -->
-      <option value="ECUADOR">Ecuador 🇪🇨</option>   <!-- ← NUEVA LÍNEA -->
+      <option value="ECUADOR">Ecuador 🇪🇨</option> <!-- ← NUEVA LÍNEA -->
     </select>
     <button onclick="addPlayer()">Agregar Guerrero</button>
     <button onclick="forceRebuild()" style="background:#4CAF50; color:white; margin-top:10px;">🔄 Sincronizar y
       Recalcular Ranking</button>
+    <button onclick="resetInactivePlayers()"
+      style="background:#d32f2f; color:white; margin-top:10px; padding:12px 20px; border-radius:8px; font-weight:bold; width:100%;">
+      🔄 Reiniciar a 0 ELO jugadores sin peleas
+    </button>
   </section>
 
   <section>
@@ -812,14 +857,41 @@
       alert("Ranking sincronizado correctamente.");
     }
 
-    function rebuild() {
-      players.forEach(p => { 
-        p.elo = 500; 
-        p.wins = 0; 
-        p.losses = 0; 
-        p.streak = 0; 
+    function resetInactivePlayers() {
+      if (!confirm("¿Estás seguro de poner en 0 ELO a todos los jugadores que NO tienen ninguna pelea jugada?\n\nEsto no afectará a los que ya jugaron al menos una vez.")) {
+        return;
+      }
+
+      let count = 0;
+      players.forEach(p => {
+        // Verificar si el jugador tiene al menos una pelea
+        const hasMatches = history.some(h => h.p1 === p.name || h.p2 === p.name);
+
+        if (!hasMatches) {
+          p.elo = 0;
+          p.wins = 0;
+          p.losses = 0;
+          p.streak = 0;
+          count++;
+        }
       });
-      
+
+      saveCloud(); // Guarda los cambios en Firebase
+
+      alert(`Se reiniciaron ${count} jugadores que no tenían peleas a 0 ELO.`);
+
+      // Refresca la vista del ranking en admin
+      renderRanking();
+    }
+
+    function rebuild() {
+      players.forEach(p => {
+        p.elo = 500;
+        p.wins = 0;
+        p.losses = 0;
+        p.streak = 0;
+      });
+
       if (history.length > 0) {
         // Procesar historial en orden cronológico (antiguo → nuevo)
         [...history].reverse().forEach(h => {
@@ -829,25 +901,25 @@
             const sa = parseInt(h.s1), sb = parseInt(h.s2);
             const winner = sa > sb ? A : B;
             const loser = sa > sb ? B : A;
-            
-            winner.wins++; 
+
+            winner.wins++;
             loser.losses++;
-            
+
             const diff = Math.abs(sa - sb);  // tu bonus por score (5-0 = 5)
             const K = 32;  // base LoL para ranked
-            
+
             // Fórmula LoL: Expected win probability
             const expected = 1 / (1 + Math.pow(10, (loser.elo - winner.elo) / 400));
-            
+
             // Ganancia/pérdida LoL + tu bonus diff score
             const gain = K * (1 - expected) + (diff * 2);
             const loss = K * expected + (diff * 2);
-            
+
             winner.elo += Math.round(gain);
             loser.elo = Math.max(0, Math.round(loser.elo - loss));
           }
         });
-        
+
         // Cálculo de racha (mantiene tu lógica actual)
         players.forEach(p => {
           let currentStreak = 0;
@@ -936,63 +1008,63 @@
     }
 
     function renderPagination(paginationId, totalItems, currentPageVar, pageChangeCallback) {
-        const totalPages = Math.ceil(totalItems / PAGE_SIZE);
-        const container = document.getElementById(paginationId);
-        
-        if (!container) {
-            console.warn(`No se encontró contenedor con id="${paginationId}"`);
-            return;
+      const totalPages = Math.ceil(totalItems / PAGE_SIZE);
+      const container = document.getElementById(paginationId);
+
+      if (!container) {
+        console.warn(`No se encontró contenedor con id="${paginationId}"`);
+        return;
+      }
+
+      container.innerHTML = "";
+      if (totalPages <= 1) return;
+
+      const maxVisible = window.innerWidth < 768 ? 7 : 11; // más botones visibles sin texto extra
+      let startPage = Math.max(1, currentPageVar - Math.floor(maxVisible / 2));
+      let endPage = Math.min(totalPages, startPage + maxVisible - 1);
+
+      if (endPage - startPage + 1 < maxVisible) {
+        startPage = Math.max(1, endPage - maxVisible + 1);
+      }
+
+      // Botones de páginas
+      if (startPage > 1) {
+        const first = document.createElement("button");
+        first.innerText = "1";
+        first.onclick = () => pageChangeCallback(1);
+        container.appendChild(first);
+
+        if (startPage > 2) {
+          const dots = document.createElement("span");
+          dots.innerText = "...";
+          dots.style.padding = "8px 12px";
+          dots.style.color = "#FFD700";
+          container.appendChild(dots);
         }
-        
-        container.innerHTML = "";
-        if (totalPages <= 1) return;
-    
-        const maxVisible = window.innerWidth < 768 ? 7 : 11; // más botones visibles sin texto extra
-        let startPage = Math.max(1, currentPageVar - Math.floor(maxVisible / 2));
-        let endPage = Math.min(totalPages, startPage + maxVisible - 1);
-    
-        if (endPage - startPage + 1 < maxVisible) {
-            startPage = Math.max(1, endPage - maxVisible + 1);
+      }
+
+      for (let i = startPage; i <= endPage; i++) {
+        const btn = document.createElement("button");
+        btn.innerText = i;
+        if (i === currentPageVar) btn.className = "active";
+        btn.onclick = () => pageChangeCallback(i);
+        container.appendChild(btn);
+      }
+
+      if (endPage < totalPages) {
+        if (endPage < totalPages - 1) {
+          const dots = document.createElement("span");
+          dots.innerText = "...";
+          dots.style.padding = "8px 12px";
+          dots.style.color = "#FFD700";
+          container.appendChild(dots);
         }
-    
-        // Botones de páginas
-        if (startPage > 1) {
-            const first = document.createElement("button");
-            first.innerText = "1";
-            first.onclick = () => pageChangeCallback(1);
-            container.appendChild(first);
-    
-            if (startPage > 2) {
-                const dots = document.createElement("span");
-                dots.innerText = "...";
-                dots.style.padding = "8px 12px";
-                dots.style.color = "#FFD700";
-                container.appendChild(dots);
-            }
-        }
-    
-        for (let i = startPage; i <= endPage; i++) {
-            const btn = document.createElement("button");
-            btn.innerText = i;
-            if (i === currentPageVar) btn.className = "active";
-            btn.onclick = () => pageChangeCallback(i);
-            container.appendChild(btn);
-        }
-    
-        if (endPage < totalPages) {
-            if (endPage < totalPages - 1) {
-                const dots = document.createElement("span");
-                dots.innerText = "...";
-                dots.style.padding = "8px 12px";
-                dots.style.color = "#FFD700";
-                container.appendChild(dots);
-            }
-    
-            const last = document.createElement("button");
-            last.innerText = totalPages;
-            last.onclick = () => pageChangeCallback(totalPages);
-            container.appendChild(last);
-        }
+
+        const last = document.createElement("button");
+        last.innerText = totalPages;
+        last.onclick = () => pageChangeCallback(totalPages);
+        container.appendChild(last);
+      }
     }
     function openEdit(id) {
       let h;
@@ -1045,11 +1117,3 @@
 </body>
 
 </html>
-
-
-
-
-
-
-
-
