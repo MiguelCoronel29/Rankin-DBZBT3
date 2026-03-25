@@ -9,362 +9,442 @@
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
 
-<style>
-    :root {
-        --primary-gold: #FFD700;
-        --dark-gold: #DAA520;
-        --dark-bg: #0a0a0a;
-        --card-bg: rgba(20, 20, 20, 0.85);
-        --border-glow: rgba(255, 215, 0, 0.3);
-    }
+    <style>
+        :root {
+            --primary-gold: #FFD700;
+            --dark-gold: #DAA520;
+            --dark-bg: #0a0a0a;
+            --card-bg: rgba(20, 20, 20, 0.85);
+            --border-glow: rgba(255, 215, 0, 0.3);
+        }
 
-    body {
-        font-family: 'Segoe UI', Arial, sans-serif;
-        background: url('Imagenes/goku wallp.jpg') no-repeat center center fixed;
-        background-size: cover;
-        color: #fff;
-        margin: 0;
-        padding: 20px 10px;
-        min-height: 100vh;
-        position: relative;
-    }
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: url('Imagenes/goku wallp.jpg') no-repeat center center fixed;
+            background-size: cover;
+            color: #fff;
+            margin: 0;
+            padding: 20px 10px;
+            min-height: 100vh;
+            position: relative;
+        }
 
-    body::before {
-        content: "";
-        position: fixed;
-        inset: 0;
-        background: linear-gradient(to bottom, rgba(0,0,0,0.7), rgba(0,0,0,0.9));
-        z-index: -1;
-    }
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            background: linear-gradient(to bottom, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.9));
+            z-index: -1;
+        }
 
-    h1 {
-        text-align: center;
-        color: var(--primary-gold);
-        font-size: 2.8rem;
-        text-transform: uppercase;
-        letter-spacing: 4px;
-        text-shadow: 0 0 20px rgba(255,215,0,0.7), 0 0 40px rgba(255,215,0,0.4);
-        margin: 0 0 25px;
-    }
+        h1 {
+            text-align: center;
+            color: var(--primary-gold);
+            font-size: 2.8rem;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.7), 0 0 40px rgba(255, 215, 0, 0.4);
+            margin: 0 0 25px;
+        }
 
-    /* Contenedor principal con glow */
-    .table-container {
-        background: var(--card-bg);
-        border-radius: 16px;
-        border: 1px solid var(--border-glow);
-        box-shadow: 0 15px 40px rgba(0,0,0,0.6), inset 0 0 20px rgba(255,215,0,0.08);
-        max-width: 100%;
-        margin: 0 auto 30px;
-        position: relative;
-    }
-
-    /* En móvil y tablets: activar scroll horizontal + barra discreta */
-    @media (max-width: 1024px) {
+        /* Contenedor principal con glow */
         .table-container {
-            overflow-x: auto;
-            overflow-y: hidden;
-            -webkit-overflow-scrolling: touch;
+            background: var(--card-bg);
+            border-radius: 16px;
+            border: 1px solid var(--border-glow);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6), inset 0 0 20px rgba(255, 215, 0, 0.08);
+            max-width: 100%;
+            margin: 0 auto 30px;
+            position: relative;
         }
 
-        /* Barra delgada en móvil */
-        .table-container::-webkit-scrollbar {
-            height: 6px;
+        /* En móvil y tablets: activar scroll horizontal + barra discreta */
+        @media (max-width: 1024px) {
+            .table-container {
+                overflow-x: auto;
+                overflow-y: hidden;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            /* Barra delgada en móvil */
+            .table-container::-webkit-scrollbar {
+                height: 6px;
+            }
+
+            .table-container::-webkit-scrollbar-track {
+                background: rgba(0, 0, 0, 0.4);
+                border-radius: 10px;
+            }
+
+            .table-container::-webkit-scrollbar-thumb {
+                background: var(--primary-gold);
+                border-radius: 10px;
+            }
         }
 
-        .table-container::-webkit-scrollbar-track {
-            background: rgba(0,0,0,0.4);
-            border-radius: 10px;
+        /* En PC grande: NO scroll horizontal */
+        @media (min-width: 1025px) {
+            .table-container {
+                overflow-x: hidden;
+            }
         }
 
-        .table-container::-webkit-scrollbar-thumb {
-            background: var(--primary-gold);
-            border-radius: 10px;
-        }
-    }
-
-    /* En PC grande: NO scroll horizontal */
-    @media (min-width: 1025px) {
-        .table-container {
-            overflow-x: hidden;
-        }
-    }
-
-    table {
-        width: 100%;
-        border-collapse: collapse;
-        font-size: 1rem;
-        min-width: 700px; /* Mantiene scroll en móvil */
-    }
-
-    @media (min-width: 1025px) {
         table {
-            min-width: 100%; /* Se adapta en PC grande sin scroll */
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 1rem;
+            min-width: 700px;
+            /* Mantiene scroll en móvil */
         }
-    }
 
-    th {
-        background: linear-gradient(145deg, #1a1a1a, #111);
-        color: var(--primary-gold);
-        text-transform: uppercase;
-        font-size: 0.85rem;
-        padding: 16px 10px;
-        border-bottom: 2px solid var(--dark-gold);
-        letter-spacing: 1px;
-    }
+        @media (min-width: 1025px) {
+            table {
+                min-width: 100%;
+                /* Se adapta en PC grande sin scroll */
+            }
+        }
 
-    td {
-        padding: 14px 10px;
-        border-bottom: 1px solid rgba(255,255,255,0.05);
-        text-align: center;
-        transition: all 0.2s;
-    }
+        th {
+            background: linear-gradient(145deg, #1a1a1a, #111);
+            color: var(--primary-gold);
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            padding: 16px 10px;
+            border-bottom: 2px solid var(--dark-gold);
+            letter-spacing: 1px;
+        }
 
-    tr:hover td {
-        background: rgba(255,215,0,0.08);
-        transform: scale(1.01);
-    }
+        td {
+            padding: 14px 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            text-align: center;
+            transition: all 0.2s;
+        }
 
-    /* Destacar filas según posición global */
-    tr[data-position="1"] td {
-        background: linear-gradient(90deg, rgba(255,215,0,0.25), rgba(255,215,0,0.08));
-        border-left: 6px solid #FFD700;
-        box-shadow: inset 0 0 15px rgba(255,215,0,0.15);
-    }
-    tr[data-position="2"] td {
-        background: linear-gradient(90deg, rgba(218,165,32,0.18), rgba(218,165,32,0.06));
-        border-left: 5px solid #DAA520;
-    }
-    tr[data-position="3"] td {
-        background: linear-gradient(90deg, rgba(218,165,32,0.12), rgba(218,165,32,0.04));
-        border-left: 5px solid #DAA520;
-    }
+        tr:hover td {
+            background: rgba(255, 215, 0, 0.08);
+            transform: scale(1.01);
+        }
 
-    tr[data-position="1"]:hover td,
-    tr[data-position="2"]:hover td,
-    tr[data-position="3"]:hover td {
-        background: linear-gradient(90deg, rgba(255,215,0,0.35), rgba(255,215,0,0.15)) !important;
-    }
+        /* Destacar filas según posición global */
+        tr[data-position="1"] td {
+            background: linear-gradient(90deg, rgba(255, 215, 0, 0.25), rgba(255, 215, 0, 0.08));
+            border-left: 6px solid #FFD700;
+            box-shadow: inset 0 0 15px rgba(255, 215, 0, 0.15);
+        }
 
-    /* Columna # con medallas */
-    td:first-child {
-        font-weight: bold;
-        color: var(--primary-gold);
-        position: relative;
-        padding-left: 35px !important;
-    }
+        tr[data-position="2"] td {
+            background: linear-gradient(90deg, rgba(218, 165, 32, 0.18), rgba(218, 165, 32, 0.06));
+            border-left: 5px solid #DAA520;
+        }
 
-    tr[data-position="1"] td:first-child::before { content: "👑"; font-size: 1.4rem; position: absolute; left: 8px; top: 50%; transform: translateY(-50%); }
-    tr[data-position="2"] td:first-child::before { content: "🥈"; font-size: 1.3rem; position: absolute; left: 10px; top: 50%; transform: translateY(-50%); }
-    tr[data-position="3"] td:first-child::before { content: "🥉"; font-size: 1.3rem; position: absolute; left: 10px; top: 50%; transform: translateY(-50%); }
+        tr[data-position="3"] td {
+            background: linear-gradient(90deg, rgba(218, 165, 32, 0.12), rgba(218, 165, 32, 0.04));
+            border-left: 5px solid #DAA520;
+        }
 
-    /* Guerrero */
-    td:nth-child(3) {
-        text-align: left;
-        font-weight: bold;
-        padding-left: 20px !important;
-    }
+        tr[data-position="1"]:hover td,
+        tr[data-position="2"]:hover td,
+        tr[data-position="3"]:hover td {
+            background: linear-gradient(90deg, rgba(255, 215, 0, 0.35), rgba(255, 215, 0, 0.15)) !important;
+        }
 
-    .player-link {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        color: #fff;
-        cursor: pointer;
-        transition: all 0.2s ease;
-    }
+        /* Columna # con medallas */
+        td:first-child {
+            font-weight: bold;
+            color: var(--primary-gold);
+            position: relative;
+            padding-left: 35px !important;
+        }
 
-    .player-link:hover {
-        color: var(--primary-gold);
-        transform: translateX(3px); /* Movimiento mínimo para evitar salto */
-    }
+        tr[data-position="1"] td:first-child::before {
+            content: "👑";
+            font-size: 1.4rem;
+            position: absolute;
+            left: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
 
-    .player-flag {
-        width: 28px;
-        height: 20px;
-        border-radius: 4px;
-        border: 1px solid rgba(255,215,0,0.3);
-    }
+        tr[data-position="2"] td:first-child::before {
+            content: "🥈";
+            font-size: 1.3rem;
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
 
-    .status-dot {
-        width: 12px;
-        height: 12px;
-        border-radius: 50%;
-        margin-left: auto;
-        flex-shrink: 0;
-    }
+        tr[data-position="3"] td:first-child::before {
+            content: "🥉";
+            font-size: 1.3rem;
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
 
-    .status-online { background: #4CAF50; animation: pulse 2s infinite; }
+        /* Guerrero */
+        td:nth-child(3) {
+            text-align: left;
+            font-weight: bold;
+            padding-left: 20px !important;
+        }
 
-    @keyframes pulse {
-        0% { box-shadow: 0 0 0 0 rgba(76,175,80,0.7); }
-        70% { box-shadow: 0 0 0 10px rgba(76,175,80,0); }
-        100% { box-shadow: 0 0 0 0 rgba(76,175,80,0); }
-    }
+        .player-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
 
-    /* Rangos con glow */
-    .rank-S { color: #FFD700; text-shadow: 0 0 10px gold; font-weight: bold; }
-    .rank-A { color: #FF5252; font-weight: bold; }
-    .rank-B { color: #4CAF50; font-weight: bold; }
-    .rank-C { color: #03A9F4; font-weight: bold; }
-    .rank-D { color: #BDBDBD; font-weight: bold; }
-    .rank-E { color: #9E9E9E; font-weight: bold; }
+        .player-link:hover {
+            color: var(--primary-gold);
+            transform: translateX(3px);
+            /* Movimiento mínimo para evitar salto */
+        }
 
-    /* Progreso con glow */
-    .progress {
-        background: rgba(0,0,0,0.5);
-        height: 8px;
-        border-radius: 4px;
-        overflow: hidden;
-        box-shadow: inset 0 1px 3px rgba(0,0,0,0.6);
-    }
+        .player-flag {
+            width: 28px;
+            height: 20px;
+            border-radius: 4px;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+        }
 
-    .progress-fill {
-        height: 100%;
-        background: linear-gradient(90deg, #FFD700, #FFEA00);
-        box-shadow: 0 0 10px rgba(255,215,0,0.7);
-        transition: width 0.6s ease;
-    }
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-left: auto;
+            flex-shrink: 0;
+        }
 
-    /* Contadores online/offline */
-    .online-offline-container {
-        display: flex;
-        justify-content: center;
-        gap: 20px;
-        margin: 25px 0;
-        flex-wrap: wrap;
-    }
+        .status-online {
+            background: #4CAF50;
+            animation: pulse 2s infinite;
+        }
 
-    .online-offline-box {
-        background: rgba(0,0,0,0.6);
-        padding: 12px 24px;
-        border-radius: 12px;
-        font-size: 1.3rem;
-        font-weight: bold;
-        border: 1px solid;
-        box-shadow: 0 5px 15px rgba(0,0,0,0.5);
-        min-width: 220px;
-        text-align: center;
-    }
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.7);
+            }
 
-    .online-box { border-color: #4CAF50; color: #4CAF50; }
-    .offline-box { border-color: #9E9E9E; color: #9E9E9E; }
+            70% {
+                box-shadow: 0 0 0 10px rgba(76, 175, 80, 0);
+            }
 
-    /* Buscador épico */
-    #searchRanking {
-        width: 100%;
-        max-width: 500px;
-        margin: 0 auto 25px;
-        display: block;
-        padding: 14px 20px;
-        border-radius: 30px;
-        border: 2px solid #444;
-        background: rgba(20,20,20,0.7);
-        color: white;
-        font-size: 1.1rem;
-        box-shadow: 0 5px 15px rgba(0,0,0,0.4);
-    }
+            100% {
+                box-shadow: 0 0 0 0 rgba(76, 175, 80, 0);
+            }
+        }
 
-    #searchRanking:focus {
-        border-color: var(--primary-gold);
-        box-shadow: 0 0 15px rgba(255,215,0,0.4);
-        outline: none;
-    }
+        /* Rangos con glow */
+        .rank-S {
+            color: #FFD700;
+            text-shadow: 0 0 10px gold;
+            font-weight: bold;
+        }
 
-    /* Modal */
-    .modal {
-        position: fixed;
-        inset: 0;
-        background: rgba(0, 0, 0, .85);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        z-index: 1000;
-    }
+        .rank-A {
+            color: #FF5252;
+            font-weight: bold;
+        }
 
-    .hidden {
-        display: none !important;
-    }
+        .rank-B {
+            color: #4CAF50;
+            font-weight: bold;
+        }
 
-    .modal-content {
-        background: linear-gradient(145deg, #1e1e1e, #111);
-        border: 2px solid var(--primary-gold);
-        box-shadow: 0 0 30px rgba(255,215,0,0.3);
-        border-radius: 16px;
-        padding: 25px;
-        max-width: 90%;
-        width: 600px;
-    }
+        .rank-C {
+            color: #03A9F4;
+            font-weight: bold;
+        }
 
-    /* Responsividad */
-    @media (max-width: 768px) {
-        h1 { font-size: 2.2rem; }
-        .table-container { padding: 0; }
-        th, td { padding: 10px 6px; font-size: 0.85rem; }
-    }
+        .rank-D {
+            color: #BDBDBD;
+            font-weight: bold;
+        }
 
-    /* Paginación grande y cómoda */
-    .pagination {
-        text-align: center;
-        margin: 25px 0;
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
-        gap: 10px;
-        padding: 10px 0;
-    }
+        .rank-E {
+            color: #9E9E9E;
+            font-weight: bold;
+        }
 
-    .pagination button {
-        min-width: 48px;
-        height: 48px;
-        padding: 0 16px;
-        border-radius: 10px;
-        border: 2px solid var(--primary-gold);
-        background: rgba(17,17,17,0.9);
-        color: var(--primary-gold);
-        font-weight: bold;
-        font-size: 1.1rem;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.5);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
+        /* Progreso con glow */
+        .progress {
+            background: rgba(0, 0, 0, 0.5);
+            height: 8px;
+            border-radius: 4px;
+            overflow: hidden;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.6);
+        }
 
-    .pagination button:hover {
-        background: var(--primary-gold);
-        color: #000;
-        transform: translateY(-3px);
-        box-shadow: 0 8px 20px rgba(255,215,0,0.4);
-    }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #FFD700, #FFEA00);
+            box-shadow: 0 0 10px rgba(255, 215, 0, 0.7);
+            transition: width 0.6s ease;
+        }
 
-    .pagination button.active {
-        background: var(--primary-gold);
-        color: #000;
-        border-color: #fff;
-        box-shadow: 0 0 20px rgba(255,215,0,0.6);
-        transform: scale(1.1);
-    }
+        /* Contadores online/offline */
+        .online-offline-container {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin: 25px 0;
+            flex-wrap: wrap;
+        }
 
-    @media (max-width: 600px) {
+        .online-offline-box {
+            background: rgba(0, 0, 0, 0.6);
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            border: 1px solid;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+            min-width: 220px;
+            text-align: center;
+        }
+
+        .online-box {
+            border-color: #4CAF50;
+            color: #4CAF50;
+        }
+
+        .offline-box {
+            border-color: #9E9E9E;
+            color: #9E9E9E;
+        }
+
+        /* Buscador épico */
+        #searchRanking {
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto 25px;
+            display: block;
+            padding: 14px 20px;
+            border-radius: 30px;
+            border: 2px solid #444;
+            background: rgba(20, 20, 20, 0.7);
+            color: white;
+            font-size: 1.1rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+        }
+
+        #searchRanking:focus {
+            border-color: var(--primary-gold);
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
+            outline: none;
+        }
+
+        /* Modal */
+        .modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, .85);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .modal-content {
+            background: linear-gradient(145deg, #1e1e1e, #111);
+            border: 2px solid var(--primary-gold);
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.3);
+            border-radius: 16px;
+            padding: 25px;
+            max-width: 90%;
+            width: 600px;
+        }
+
+        /* Responsividad */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.2rem;
+            }
+
+            .table-container {
+                padding: 0;
+            }
+
+            th,
+            td {
+                padding: 10px 6px;
+                font-size: 0.85rem;
+            }
+        }
+
+        /* Paginación grande y cómoda */
+        .pagination {
+            text-align: center;
+            margin: 25px 0;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            padding: 10px 0;
+        }
+
         .pagination button {
-            min-width: 52px;
-            height: 52px;
-            font-size: 1.2rem;
-            padding: 0 18px;
+            min-width: 48px;
+            height: 48px;
+            padding: 0 16px;
+            border-radius: 10px;
+            border: 2px solid var(--primary-gold);
+            background: rgba(17, 17, 17, 0.9);
+            color: var(--primary-gold);
+            font-weight: bold;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
-    }
-</style>
+
+        .pagination button:hover {
+            background: var(--primary-gold);
+            color: #000;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(255, 215, 0, 0.4);
+        }
+
+        .pagination button.active {
+            background: var(--primary-gold);
+            color: #000;
+            border-color: #fff;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.6);
+            transform: scale(1.1);
+        }
+
+        @media (max-width: 600px) {
+            .pagination button {
+                min-width: 52px;
+                height: 52px;
+                font-size: 1.2rem;
+                padding: 0 18px;
+            }
+        }
+    </style>
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-5C5SDM9QZG"></script>
     <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-5C5SDM9QZG');
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+        gtag('config', 'G-5C5SDM9QZG');
     </script>
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1831930018468380"
-     crossorigin="anonymous"></script>
+        crossorigin="anonymous"></script>
 </head>
 
 <body>
@@ -401,33 +481,30 @@
     <div style="text-align: center; margin: 20px 0; max-width: 100%; overflow: hidden;">
 
         <script>
-              atOptions = {
-                'key' : 'ea7c460a95baaa7dc4a2bc45b7502fb2',
-                'format' : 'iframe',
-                'height' : 90,
-                'width' : 728,
-                'params' : {}
-              };
+            atOptions = {
+                'key': 'ea7c460a95baaa7dc4a2bc45b7502fb2',
+                'format': 'iframe',
+                'height': 90,
+                'width': 728,
+                'params': {}
+            };
         </script>
         <script src="https://www.highperformanceformat.com/ea7c460a95baaa7dc4a2bc45b7502fb2/invoke.js"></script>
     </div>
 
     <div style="text-align: center; margin: 20px 0;">
-      <input 
-        id="searchRanking" 
-        placeholder="🔍 Buscar guerrero..." 
-        style="width: 100%; max-width: 400px; padding: 12px 16px; border-radius: 12px; border: 1px solid #444; background: #111; color: white; font-size: 1rem; box-sizing: border-box;"
-      >
+        <input id="searchRanking" placeholder="🔍 Buscar guerrero..."
+            style="width: 100%; max-width: 400px; padding: 12px 16px; border-radius: 12px; border: 1px solid #444; background: #111; color: white; font-size: 1rem; box-sizing: border-box;">
     </div>
 
     <div class="online-offline-container">
-      <div class="online-offline-box online-box">
-        Jugadores en línea: <strong id="onlineCount">0</strong> 🟢
-      </div>
-      
-      <div class="online-offline-box offline-box">
-        Jugadores desconectados: <strong id="offlineCount">0</strong> ⚪
-      </div>
+        <div class="online-offline-box online-box">
+            Jugadores en línea: <strong id="onlineCount">0</strong> 🟢
+        </div>
+
+        <div class="online-offline-box offline-box">
+            Jugadores desconectados: <strong id="offlineCount">0</strong> ⚪
+        </div>
     </div>
 
     <div class="table-container">
@@ -484,24 +561,25 @@
         let chartInstance = null;
 
         const ranks = [
-            { name: "E", min: 0, max: 699, class: "rank-E" },
-            { name: "D", min: 700, max: 999, class: "rank-D" },
-            { name: "C", min: 1000, max: 1299, class: "rank-C" },
-            { name: "B", min: 1300, max: 1599, class: "rank-B" },
-            { name: "A", min: 1600, max: 1899, class: "rank-A" },
-            { name: "S", min: 1900, max: Infinity, class: "rank-S" }
+            { name: "E", min: 0, max: 499, class: "rank-E" },
+            { name: "D", min: 500, max: 799, class: "rank-D" },
+            { name: "C", min: 800, max: 1099, class: "rank-C" },
+            { name: "B", min: 1100, max: 1399, class: "rank-B" },
+            { name: "A", min: 1400, max: 1799, class: "rank-A" },
+            { name: "S", min: 1800, max: Infinity, class: "rank-S" }
         ];
 
         function getBanderaHTML(country) {
             if (!country) return "🏳️";
-            const banderas = { "ARGENTINA": "bandera argentina.png",
-              "PERÚ": "bandera peru.png",
-              "PARAGUAY": "bandera paraguay.png",
-              "CHILE": "bandera chile.png",
-              "URUGUAY": "bandera uruguay.png",
-              "BRASIL": "bandera brasil.png",
-              "VENEZUELA": "bandera venezuela.png",     // clave exacta
-              "ECUADOR": "bandera ecuador.png"   // ← AGREGAR ESTA LÍNEA
+            const banderas = {
+                "ARGENTINA": "bandera argentina.png",
+                "PERÚ": "bandera peru.png",
+                "PARAGUAY": "bandera paraguay.png",
+                "CHILE": "bandera chile.png",
+                "URUGUAY": "bandera uruguay.png",
+                "BRASIL": "bandera brasil.png",
+                "VENEZUELA": "bandera venezuela.png",     // clave exacta
+                "ECUADOR": "bandera ecuador.png"   // ← AGREGAR ESTA LÍNEA
             };
 
             const file = banderas[country.toUpperCase()];
@@ -523,33 +601,33 @@
             });
             render();
             verificarSesion();
-        
+
             // Listener para status online/offline + contadores (Paso 6)
             db.ref('status').on('value', snapshotStatus => {
                 const statusData = snapshotStatus.val() || {};
-        
+
                 // Actualiza puntos en la tabla
                 document.querySelectorAll('[id^="status-"]').forEach(span => {
-                  const rawId = span.id.replace('status-', '');
-                  const playerName = rawId.replace(/_/g, '-');
-                
-                  const userStatus = statusData[playerName];
-                  span.className = ''; // limpia clases previas
-                  span.innerHTML = ''; // limpia contenido anterior
-                
-                  if (userStatus && userStatus.online === true) {
-                    span.classList.add('status-online');
-                  } else {
-                    span.innerHTML = '⚪';
-                    span.style.color = '#9E9E9E';
-                    span.style.fontSize = '1.1em';
-                  }
+                    const rawId = span.id.replace('status-', '');
+                    const playerName = rawId.replace(/_/g, '-');
+
+                    const userStatus = statusData[playerName];
+                    span.className = ''; // limpia clases previas
+                    span.innerHTML = ''; // limpia contenido anterior
+
+                    if (userStatus && userStatus.online === true) {
+                        span.classList.add('status-online');
+                    } else {
+                        span.innerHTML = '⚪';
+                        span.style.color = '#9E9E9E';
+                        span.style.fontSize = '1.1em';
+                    }
                 });
-        
+
                 // Contador de jugadores online
                 const onlinePlayers = Object.values(statusData).filter(s => s.online === true).length;
                 document.getElementById('onlineCount').innerText = onlinePlayers;
-        
+
                 // Contador desconectados: TODOS los jugadores de /players - online
                 db.ref('players').once('value').then(playersSnapshot => {
                     const allPlayers = playersSnapshot.val() || {};
@@ -575,7 +653,7 @@
                 const pos = ordenados.findIndex(x => x.name === p.name) + 1;
                 const rachaClass = p.streak > 0 ? 'color:#4caf50' : 'color:#ff5252';
                 const rachaIcon = p.streak > 0 ? '🔥' : (p.streak < 0 ? '💀' : '');
-        
+
                 return `<tr data-position="${pos}">  <!-- ← ESTA ES LA LÍNEA QUE FALTABA -->
                     <td style="font-weight:bold; color:#aaa;">${pos}</td>
                     <td style="padding-right: 4px !important; text-align: right;">${getBanderaHTML(p.country)}</td>
@@ -612,41 +690,41 @@
 
         // --- LÓGICA DE SESIÓN ---
         function verificarSesion() {
-          const nombre = localStorage.getItem("logged_user");
-          const userBar = document.getElementById("user-bar");
-          const loginPrompt = document.getElementById("login-prompt");
-          const nameDisplay = document.getElementById("current-user-name");
-        
-          if (nombre) {
-            userBar.style.display = "flex";
-            loginPrompt.style.display = "none";
-            nameDisplay.innerText = nombre;
-        
-            // Marca online SOLO una vez por sesión
-            if (!alreadyMarkedOnline[nombre]) {
-              alreadyMarkedOnline[nombre] = true;
-        
-              const statusRef = db.ref('status/' + nombre);
-        
-              statusRef.set({
-                online: true,
-                lastActive: firebase.database.ServerValue.TIMESTAMP,
-                device: navigator.userAgent
-              }).then(() => {
-                console.log(nombre + " marcado como ONLINE (solo una vez)");
-              }).catch(err => console.error("Error al marcar online:", err));
-        
-              statusRef.onDisconnect().set({
-                online: false,
-                lastActive: firebase.database.ServerValue.TIMESTAMP
-              }).then(() => {
-                console.log("onDisconnect configurado para " + nombre);
-              }).catch(err => console.error("Error en onDisconnect:", err));
+            const nombre = localStorage.getItem("logged_user");
+            const userBar = document.getElementById("user-bar");
+            const loginPrompt = document.getElementById("login-prompt");
+            const nameDisplay = document.getElementById("current-user-name");
+
+            if (nombre) {
+                userBar.style.display = "flex";
+                loginPrompt.style.display = "none";
+                nameDisplay.innerText = nombre;
+
+                // Marca online SOLO una vez por sesión
+                if (!alreadyMarkedOnline[nombre]) {
+                    alreadyMarkedOnline[nombre] = true;
+
+                    const statusRef = db.ref('status/' + nombre);
+
+                    statusRef.set({
+                        online: true,
+                        lastActive: firebase.database.ServerValue.TIMESTAMP,
+                        device: navigator.userAgent
+                    }).then(() => {
+                        console.log(nombre + " marcado como ONLINE (solo una vez)");
+                    }).catch(err => console.error("Error al marcar online:", err));
+
+                    statusRef.onDisconnect().set({
+                        online: false,
+                        lastActive: firebase.database.ServerValue.TIMESTAMP
+                    }).then(() => {
+                        console.log("onDisconnect configurado para " + nombre);
+                    }).catch(err => console.error("Error en onDisconnect:", err));
+                }
+            } else {
+                userBar.style.display = "none";
+                loginPrompt.style.display = "block";
             }
-          } else {
-            userBar.style.display = "none";
-            loginPrompt.style.display = "block";
-          }
         }
         function cerrarSesion() {
             if (confirm("¿Cerrar sesión de guerrero?")) {
@@ -660,10 +738,10 @@
         function openModal(name) {
             const p = players.find(x => x.name === name);
             if (!p) return;
-        
+
             // Título del modal
             document.getElementById('modalTitle').innerHTML = `${getBanderaHTML(p.country)} ${p.name}`;
-        
+
             // Estadísticas básicas
             document.getElementById('modalStats').innerHTML = `
                 <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 10px; text-align:left;">
@@ -677,7 +755,7 @@
                         VER PERFIL COMPLETO
                 </button>
             `;
-        
+
             // Últimas 5 peleas (sin invertir, ya que history está ordenada descendente)
             const ultimasPeleas = history.filter(h => h.p1 === name || h.p2 === name).slice(0, 5);
             document.getElementById('modalHistory').innerHTML = ultimasPeleas.map(h => {
@@ -687,10 +765,10 @@
                     ${h.p1} ${h.s1} - ${h.s2} ${h.p2}
                 </li>`;
             }).join("");
-        
+
             // Mostrar el modal (quita hidden)
             document.getElementById('modal').classList.remove("hidden");
-        
+
             // Opcional: si querés cargar un gráfico simple aquí (puede ser pesado, así que lo dejamos comentado por ahora)
             // renderMiniChart(name); // si tenés una función para gráfico pequeño
         }
@@ -705,22 +783,3 @@
 </body>
 
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
