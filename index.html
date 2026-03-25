@@ -671,6 +671,9 @@
                 </tr>`;
             }).join("");
             renderPagination(filtrados.length);
+
+            // ← ESTA ES LA LÍNEA QUE DEBES AGREGAR AQUÍ
+            updateOnlineStatus();
         }
 
         function renderPagination(totalItems) {
@@ -731,6 +734,30 @@
                 localStorage.removeItem("logged_user");
                 location.reload();
             }
+        }
+
+        // Función para actualizar los puntos online/offline cada vez que se renderiza la tabla
+        function updateOnlineStatus() {
+            db.ref('status').once('value', snapshot => {
+                const statusData = snapshot.val() || {};
+
+                document.querySelectorAll('[id^="status-"]').forEach(span => {
+                    const rawId = span.id.replace('status-', '');
+                    const playerName = rawId.replace(/_/g, '-');
+
+                    const userStatus = statusData[playerName];
+                    span.className = '';
+                    span.innerHTML = '';
+
+                    if (userStatus && userStatus.online === true) {
+                        span.classList.add('status-online');
+                    } else {
+                        span.innerHTML = '⚪';
+                        span.style.color = '#9E9E9E';
+                        span.style.fontSize = '1.1em';
+                    }
+                });
+            });
         }
 
         // --- MODAL Y GRÁFICO ---
