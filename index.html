@@ -562,12 +562,12 @@
         let chartInstance = null;
 
         const ranks = [
-            { name: "E", min: 0, max: 499, class: "rank-E" },
-            { name: "D", min: 500, max: 799, class: "rank-D" },
-            { name: "C", min: 800, max: 1099, class: "rank-C" },
-            { name: "B", min: 1100, max: 1399, class: "rank-B" },
-            { name: "A", min: 1400, max: 1799, class: "rank-A" },
-            { name: "S", min: 1800, max: Infinity, class: "rank-S" }
+            { name: "E", min: 0, max: 99, class: "rank-E" },
+            { name: "D", min: 100, max: 299, class: "rank-D" },
+            { name: "C", min: 300, max: 499, class: "rank-C" },
+            { name: "B", min: 500, max: 699, class: "rank-B" },
+            { name: "A", min: 700, max: 999, class: "rank-A" },
+            { name: "S", min: 1000, max: Infinity, class: "rank-S" }
         ];
 
         function getBanderaHTML(country) {
