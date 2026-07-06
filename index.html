@@ -9,7 +9,8 @@
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-database-compat.js"></script>
 
-    <link rel="stylesheet" href="css/estilos.css"><!--esta linea se encarga de llamar a los estilos que estan en la carpeta css-->
+    <link rel="stylesheet" href="css/estilos.css">
+    <!--esta linea se encarga de llamar a los estilos que estan en la carpeta css-->
 
     <!-- Google tag (gtag.js) para estadisticas y anuncios-->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-5C5SDM9QZG"></script>
@@ -25,53 +26,28 @@
 
 <body>
 
-    <div id="user-identity-container" style="max-width: 800px; margin: 10px auto; text-align: center;">
-        <div id="user-bar"
-            style="background: rgba(26,26,26,0.9); padding: 15px; border-radius: 10px; display: none; justify-content: space-between; align-items: center; border: 1px solid #FFD700;">
-            <span style="color: white;">👤 Guerrero: <strong id="current-user-name"
-                    style="color: #FFD700;"></strong></span>
+    <div id="user-identity-container">
+        <div id="user-bar">
+            <span>👤 Guerrero: <strong id="current-user-name"></strong></span>
             <div>
-                <!-- 
-                <button onclick="window.location.href='sala.html'"
-                    style="background: #FFD700; color: black; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-weight: bold; margin-right: 10px;">⚔️
-                    Arena</button>-->
-                <button onclick="cerrarSesion()"
-                    style="background: #ff4444; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-weight: bold;">Salir</button>
+                <button onclick="cerrarSesion()">Salir</button>
             </div>
         </div>
 
-        <div id="login-prompt"
-            style="background: rgba(26,26,26,0.9); padding: 20px; border-radius: 10px; border: 1px solid #444; display: none;">
-            <p style="color: #aaa; margin-bottom: 15px;">Inicia sesión para registrar tus victorias y entrar a las
-                salas:</p>
-            <a href="login.html" style="text-decoration: none;">
-                <button
-                    style="background: #03a9f4; color: #000; border: none; padding: 12px 25px; border-radius: 8px; cursor: pointer; font-weight: bold;">
-                    🔑 INGRESAR AL RANKING
+        <div id="login-prompt">
+            <p>Inicia sesión para registrar tus victorias y entrar a las salas:</p>
+            <a href="login.html">
+                <button>
+                🔑 INGRESAR AL RANKING
                 </button>
             </a>
         </div>
     </div>
 
     <h1>🔥 RANKING DBZ BT3 🔥</h1>
-    <!-- 
-    <div style="text-align: center; margin: 20px 0; max-width: 100%; overflow: hidden;">
-
-        <script>
-            atOptions = {
-                'key': 'ea7c460a95baaa7dc4a2bc45b7502fb2',
-                'format': 'iframe',
-                'height': 90,
-                'width': 728,
-                'params': {}
-            };
-        </script>
-        <script src="https://www.highperformanceformat.com/ea7c460a95baaa7dc4a2bc45b7502fb2/invoke.js"></script>
-    </div>-->
-
-    <div style="text-align: center; margin: 20px 0;">
-        <input id="searchRanking" placeholder="🔍 Buscar guerrero..."
-            style="width: 100%; max-width: 400px; padding: 12px 16px; border-radius: 12px; border: 1px solid #444; background: #111; color: white; font-size: 1rem; box-sizing: border-box;">
+    
+    <div>
+        <input id="searchRanking" placeholder="🔍 Buscar jugador...">
     </div>
 
     <div class="online-offline-container">
