@@ -1,3 +1,16 @@
+#NOTA {
+    background: rgba(51, 51, 51, 0.486); /* Fondo rojo muy sutil y transparente */
+    border:  #ff4444;                  /* Borde punteado rojo para que parezca una alerta */
+    color: #fff;                       /* Texto blanco para que se lea bien */
+    padding: 15px;                       /* Espacio interno para que el texto no toque los bordes */
+    border-radius: 8px;                  /* Bordes redondeados para que quede prolijo */
+    margin: 20px auto;                   /* Separación con los elementos de arriba/abajo y centrado */
+    max-width: 800px;                    /* Ancho máximo para que no se estire al infinito en PC */
+    width: 90%;                          /* Se adapta bien en pantallas de celular */
+    font-weight: bold;                   /* Letra en negrita */
+    text-align: center;                  /* Centra el texto del anuncio */
+    box-shadow: 0 0 10px rgba(255, 68, 68, 0.3); /* Un pequeño brillo rojo de fondo estilo aura */
+}
 /* Medidas del rectangulo inicial */
 #user-identity-container {
     max-width: 500px;
