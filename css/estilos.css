@@ -13,24 +13,31 @@
 }
 /* Medidas del rectangulo inicial */
 #user-identity-container {
-    max-width: 500px;
-    margin: 10px auto;
-    text-align: center;
+    display: flex;
+    justify-content: flex-end; /* Lleva la barra automáticamente a la derecha */
+    width: 100%;
+    max-width: 1200px; /* O el ancho máximo que use tu diseño */
+    margin: 0 auto 20px auto; /* Centra el contenedor y le da espacio abajo */
+    padding: 0 20px; /* Evita que se pegue al borde de la pantalla en los laterales */
+    box-sizing: border-box;
 }
 /* Estilos del rectangulo y aura*/
 #user-bar {
-    background: rgba(26,26,26,0.9);
-    max-width: 270px;
-    padding: 10px;
+    background: rgba(26, 26, 26, 0.9);
+    padding: 10px 15px;
     border-radius: 10px;
-    display: flex; /* 👈 Este es el que controla que se oculte al inicio */
+    border: 1px solid rgb(0, 255, 128);
+    
+    /* Control de diseño flexible */
+    display: flex;
     justify-content: space-between;
     align-items: center;
-    border: 1px solid rgb(0, 255, 128);       
-    position: absolute;
-    top: 30px; 
-    left: 950px;
-    width: 90%;                
+    gap: 15px; /* Separación interna entre el nombre y el botón Salir */
+    
+    /* Esto evita que se rompa con el zoom */
+    width: fit-content; 
+    max-width: 100%;
+    box-sizing: border-box;
 }
 /*Color de la palabra "USUARIO" cuando ya esta logueado*/
 #user-bar span {
