@@ -1,46 +1,51 @@
-/* Primer div del body */
+/* Medidas del rectangulo inicial */
 #user-identity-container {
     max-width: 500px;
     margin: 10px auto;
     text-align: center;
 }
-
+/* Estilos del rectangulo y aura*/
 #user-bar {
-    background: rgba(26,26,26,0.9); 
-    padding: 15px; 
-    border-radius: 10px; 
-    display: none; 
-    justify-content: space-between; 
-    align-items: center; 
-    border: 1px solid #FFD700;
+    background: rgba(26,26,26,0.9);
+    max-width: 270px;
+    padding: 10px;
+    border-radius: 10px;
+    display: flex; /* 👈 Este es el que controla que se oculte al inicio */
+    justify-content: space-between;
+    align-items: center;
+    border: 1px solid rgb(0, 255, 128);       
+    position: absolute;
+    top: 30px; 
+    left: 950px;
+    width: 90%;                
 }
-
+/*Color de la palabra "USUARIO" cuando ya esta logueado*/
 #user-bar span {
-    color: white;
+    color: rgb(0, 174, 255);
 }
-
+/*Color del nombre del usuario*/
 #current-user-name {
-    color: #FFD700
+    color: #ffffff
 }
-
+/* Color y tamaño del rectangulo offline */
 #login-prompt {
-    background: rgba(10,10,10,0.9); 
+    background: rgba(46, 46, 46, 0.9); 
     padding: 10px; 
     border-radius: 10px; 
     border: 1px solid #444; 
     display: none;
 }
-
-#user-bar-button {
-    background: #ff4444; 
-    color: white; 
-    border: none; 
-    padding: 8px 15px; 
-    border-radius: 5px; 
-    cursor: pointer; 
+/* Color del botón salir */
+#user-bar button {
+    background: rgb(235, 34, 101);
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
     font-weight: bold;
 }
-
+/* Color de letras de "Inicia sesión para.." del rectangulo inicial */
 #login-prompt p {
     color: #ffffff;
     margin-bottom: 15px;
@@ -49,7 +54,7 @@
 #login-prompt a {
      text-decoration: none;
 }
-
+/* Botón para loguearse */
 #login-prompt button {
     background: #03a9f4; 
     color: #000; 
@@ -59,18 +64,29 @@
     cursor: pointer; 
     font-weight: bold;
 }
-/* Cierre del primer div del body */
+/* Función responsive */
+@media (max-width: 768px) {
+    /* ... lo que ya tenías del h1 y la tabla ... */
+
+    #user-bar {
+        position: relative; /* En celular le quitamos el absolute para que no flote encima del título */
+        top: 0;
+        left: 0;
+        margin: 10px auto;  /* La centramos de forma prolija arriba del título */
+        max-width: 53%;     /* Evitamos que se desborde del ancho de la pantalla */
+    }
+}
 
 h1 {
     text-align: center;
-    color: var(--primary-gold);
+    color: rgb(0, 255, 128);
     font-size: 2.8rem;
     text-transform: uppercase;
     letter-spacing: 4px;
-    text-shadow: 0 0 20px rgba(255, 215, 0, 0.7), 0 0 40px rgba(255, 215, 0, 0.4);
+    text-shadow: 0 0 20px rgba(0, 132, 255, 0.7), 0 0 40px rgba(255, 215, 0, 0.4);
     margin: 0 0 25px;
 }
-
+/* Buscador de jugadores */
 #searchRanking {
     width: 100%;
     max-width: 200px;
@@ -125,7 +141,7 @@ h1 {
 
 body {
     font-family: 'Segoe UI', Arial, sans-serif;
-    background: url('Imagenes/goku wallp.jpg') no-repeat center center fixed;
+    background: url('../Imagenes/goku wallp.jpg') no-repeat center center fixed;
     background-size: cover;
     color: #fff;
     margin: 0;
